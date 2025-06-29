@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 
-class _CalculatorInput extends StatefulWidget {
+class CalculatorInput extends StatefulWidget {
   final void Function(String) onExpressionEvaluated;
-  const _CalculatorInput({required this.onExpressionEvaluated});
+  const CalculatorInput({required this.onExpressionEvaluated});
 
   @override
-  State<_CalculatorInput> createState() => _CalculatorInputState();
+  State<CalculatorInput> createState() => CalculatorInputState();
 }
 
-class _CalculatorInputState extends State<_CalculatorInput> {
+class CalculatorInputState extends State<CalculatorInput> {
   final TextEditingController _controller = TextEditingController();
   String _result = '';
   String _error = '';

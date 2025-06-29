@@ -203,7 +203,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
             ),
             const SizedBox(height: 24),
             // Calculator section
-            _CalculatorInput(
+            CalculatorInput(
               onExpressionEvaluated: (value) {
                 _inputController.text = value;
                 _convert();
