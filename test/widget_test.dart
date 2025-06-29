@@ -63,7 +63,7 @@ void main() {
     expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
   });
 
-  testWidgets('Calculator shows visible buttons', (WidgetTester tester) async {
+  testWidgets('Calculator shows all buttons in 5x4 layout', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
         body: CalculatorInput(
@@ -72,23 +72,27 @@ void main() {
         ),
       ),
     ));
-    // Print all visible text widgets for debugging
-    final textWidgets = find.byType(Text);
-    for (final element in textWidgets.evaluate()) {
-      final widget = element.widget as Text;
-      if (widget.data != null && widget.data!.trim().isNotEmpty) {
-        print('Calculator Text: "${widget.data}"');
-      }
+    // Check for the presence of all calculator buttons in the new layout
+    final expectedButtons = [
+      '7', '8', '9', 'C', '%',
+      '4', '5', '6', '÷', '×',
+      '1', '2', '3', '-', '+',
+      '.', '0', '⌫', '±', '=',
+    ];
+    for (final label in expectedButtons) {
+      expect(find.widgetWithText(ElevatedButton, label), findsOneWidget, reason: 'Button $label should be present');
     }
-    // Check for the presence of visible calculator buttons
-    expect(find.text('7'), findsOneWidget);
-    expect(find.text('8'), findsOneWidget);
-    expect(find.text('9'), findsOneWidget);
-    expect(find.text('÷'), findsOneWidget);
-    expect(find.text('4'), findsOneWidget);
-    expect(find.text('5'), findsOneWidget);
-    expect(find.text('6'), findsOneWidget);
-    expect(find.text('×'), findsOneWidget);
+    // Tap a few buttons to ensure they are tappable
+    await tester.tap(find.widgetWithText(ElevatedButton, '7'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ElevatedButton, '+'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ElevatedButton, '2'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ElevatedButton, '='));
+    await tester.pump();
+    // The expression should update and not throw
+    expect(find.textContaining('7+2'), findsOneWidget);
   });
 
   testWidgets('ConverterScreen does not overflow on small screens', (WidgetTester tester) async {
