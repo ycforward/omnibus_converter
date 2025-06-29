@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'converter_screen.dart';
 import '../models/converter_type.dart';
+import '../widgets/app_logo.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,6 +18,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(child: AppLogo(size: 72)),
+            const SizedBox(height: 16),
             Text(
               'Choose Conversion Type',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(

@@ -28,6 +28,30 @@ class CalculatorInputState extends State<CalculatorInput> {
           widget.onExpressionEvaluated(_result);
         }
         return;
+      } else if (value == '%') {
+        // Treat % as divide by 100 for the last number
+        final regex = RegExp(r'(\d+\.?\d*)');
+        final matches = regex.allMatches(_expression);
+        if (matches.isNotEmpty) {
+          final match = matches.last;
+          final number = match.group(0);
+          if (number != null) {
+            _expression = _expression.substring(0, match.start) + (double.parse(number) / 100).toString();
+          }
+        }
+      } else if (value == '±') {
+        // Toggle sign of the last number
+        final regex = RegExp(r'(\d+\.?\d*)');
+        final matches = regex.allMatches(_expression);
+        if (matches.isNotEmpty) {
+          final match = matches.last;
+          final number = match.group(0);
+          if (number != null) {
+            double n = double.parse(number);
+            n = -n;
+            _expression = _expression.substring(0, match.start) + n.toString();
+          }
+        }
       } else {
         _expression += value;
       }
@@ -44,7 +68,14 @@ class CalculatorInputState extends State<CalculatorInput> {
         _result = '';
         return;
       }
-      final exp = Parser().parse(_expression.replaceAll('×', '*').replaceAll('÷', '/'));
+      String expr = _expression;
+      // Handle incomplete expressions
+      if (expr.endsWith('+') || expr.endsWith('-')) {
+        expr += '0';
+      } else if (expr.endsWith('×') || expr.endsWith('*') || expr.endsWith('÷') || expr.endsWith('/')) {
+        expr += '1';
+      }
+      final exp = Parser().parse(expr.replaceAll('×', '*').replaceAll('÷', '/'));
       final eval = exp.evaluate(EvaluationType.REAL, ContextModel());
       _result = eval.toString();
     } catch (e) {
@@ -77,35 +108,63 @@ class CalculatorInputState extends State<CalculatorInput> {
 
   @override
   Widget build(BuildContext context) {
+    final buttons = [
+      // Row 1
+      '7', '8', '9', 'C', '%',
+      // Row 2
+      '4', '5', '6', '÷', '×',
+      // Row 3
+      '1', '2', '3', '-', '+',
+      // Row 4
+      '.', '0', '⌫', '±', '=',
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Show the current expression above the calculator grid
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            _expression.isEmpty ? '0' : _expression,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500),
+            textAlign: TextAlign.right,
+          ),
+        ),
+        const SizedBox(height: 8),
         Expanded(
-          child: GridView.count(
-            crossAxisCount: 4,
-            shrinkWrap: false,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 5,
+              childAspectRatio: 1.1,
+            ),
+            itemCount: buttons.length,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.2,
-            children: [
-              _buildButton('7'),
-              _buildButton('8'),
-              _buildButton('9'),
-              _buildButton('÷', color: Theme.of(context).colorScheme.primary.withOpacity(0.15)),
-              _buildButton('4'),
-              _buildButton('5'),
-              _buildButton('6'),
-              _buildButton('×', color: Theme.of(context).colorScheme.primary.withOpacity(0.15)),
-              _buildButton('1'),
-              _buildButton('2'),
-              _buildButton('3'),
-              _buildButton('-', color: Theme.of(context).colorScheme.primary.withOpacity(0.15)),
-              _buildButton('0'),
-              _buildButton('.'),
-              _buildButton('C', color: Colors.red.withOpacity(0.15)),
-              _buildButton('+', color: Theme.of(context).colorScheme.primary.withOpacity(0.15)),
-              _buildButton('⌫', color: Colors.grey.withOpacity(0.15), fontSize: 22),
-              _buildButton('=', color: Theme.of(context).colorScheme.primary),
-            ],
+            itemBuilder: (context, index) {
+              final label = buttons[index];
+              if (label.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              Color? color;
+              double fontSize = 24;
+              if (label == '÷' || label == '×' || label == '-' || label == '+' || label == '%') {
+                color = Theme.of(context).colorScheme.primary.withOpacity(0.15);
+              } else if (label == 'C') {
+                color = Colors.red.withOpacity(0.15);
+              } else if (label == '⌫') {
+                color = Colors.grey.withOpacity(0.15);
+                fontSize = 22;
+              } else if (label == '=') {
+                color = Theme.of(context).colorScheme.primary;
+                fontSize = 26;
+              } else if (label == '±') {
+                color = Colors.grey.withOpacity(0.10);
+              }
+              return _buildButton(label, color: color, fontSize: fontSize);
+            },
           ),
         ),
       ],
