@@ -51,4 +51,27 @@ void main() {
     // If there is an overflow, the test will fail with an exception
     expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
   });
+
+  testWidgets('Calculator evaluates expressions and updates input', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(
+        body: _CalculatorInput(
+          onExpressionEvaluated: null, // We'll check the result visually
+        ),
+      ),
+    ));
+    await tester.enterText(find.byType(TextField), '2*14+5');
+    await tester.tap(find.text('Evaluate'));
+    await tester.pump();
+    expect(find.textContaining('Result: 33'), findsOneWidget);
+  });
+
+  testWidgets('No extra From/To labels above dropdowns', (WidgetTester tester) async {
+    await tester.pumpWidget(const ConverterApp());
+    await tester.tap(find.text('Length'));
+    await tester.pumpAndSettle();
+    // There should only be one 'From' and one 'To' (the dropdown hints), not two
+    expect(find.text('From'), findsOneWidget);
+    expect(find.text('To'), findsOneWidget);
+  });
 }
