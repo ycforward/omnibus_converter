@@ -3,6 +3,7 @@ import '../models/converter_type.dart';
 import '../services/conversion_service.dart';
 import '../widgets/conversion_input.dart';
 import '../widgets/unit_selector.dart';
+import '../widgets/calculator_input.dart';
 
 class ConverterScreen extends StatefulWidget {
   final ConverterType converterType;
@@ -129,7 +130,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         _convert();
                       }
                     },
-                    label: 'From',
+                    label: '',
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -153,7 +154,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         _convert();
                       }
                     },
-                    label: 'To',
+                    label: '',
                   ),
                 ),
               ],
@@ -199,6 +200,14 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     ),
                 ],
               ),
+            ),
+            const SizedBox(height: 24),
+            // Calculator section
+            _CalculatorInput(
+              onExpressionEvaluated: (value) {
+                _inputController.text = value;
+                _convert();
+              },
             ),
             
             const Spacer(),
