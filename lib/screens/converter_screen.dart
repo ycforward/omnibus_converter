@@ -15,19 +15,18 @@ class ConverterScreen extends StatefulWidget {
 }
 
 class _ConverterScreenState extends State<ConverterScreen> {
-  final TextEditingController _inputController = TextEditingController();
   final ConversionService _conversionService = ConversionService();
   
   String _fromUnit = '';
   String _toUnit = '';
   String _result = '';
+  String _sourceValue = '';
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _initializeUnits();
-    _inputController.addListener(_onInputChanged);
   }
 
   void _initializeUnits() {
@@ -38,26 +37,30 @@ class _ConverterScreenState extends State<ConverterScreen> {
     }
   }
 
-  void _onInputChanged() {
-    _convert();
+  void _onCalculatorChanged(String value) {
+    setState(() {
+      _sourceValue = value;
+    });
+    _convertLive(value);
   }
 
-  void _convert() {
-    if (_inputController.text.isEmpty) {
+  void _convertLive(String value) {
+    if (value.isEmpty) {
       setState(() {
         _result = '';
       });
       return;
     }
-
-    final input = double.tryParse(_inputController.text);
-    if (input == null) return;
-
+    final input = double.tryParse(value);
+    if (input == null) {
+      setState(() {
+        _result = '';
+      });
+      return;
+    }
     setState(() {
       _isLoading = true;
     });
-
-    // Simulate API delay for currency conversion
     if (widget.converterType == ConverterType.currency) {
       Future.delayed(const Duration(milliseconds: 500), () {
         _performConversion(input);
@@ -94,7 +97,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       _fromUnit = _toUnit;
       _toUnit = temp;
     });
-    _convert();
+    _convertLive(_sourceValue);
   }
 
   @override
@@ -104,143 +107,145 @@ class _ConverterScreenState extends State<ConverterScreen> {
         title: Text(widget.converterType.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Input section
-            ConversionInput(
-              controller: _inputController,
-              label: 'Enter value',
-            ),
-            const SizedBox(height: 24),
-            
-            // Unit selectors
-            Row(
-              children: [
-                Expanded(
-                  child: UnitSelector(
-                    value: _fromUnit,
-                    units: _conversionService.getUnits(widget.converterType),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _fromUnit = value;
-                        });
-                        _convert();
-                      }
-                    },
-                    label: '',
-                  ),
-                ),
-                const SizedBox(width: 16),
-                IconButton(
-                  onPressed: _swapUnits,
-                  icon: const Icon(Icons.swap_horiz),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: UnitSelector(
-                    value: _toUnit,
-                    units: _conversionService.getUnits(widget.converterType),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _toUnit = value;
-                        });
-                        _convert();
-                      }
-                    },
-                    label: '',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            
-            // Result section
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                ),
-              ),
-              child: Column(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Unit selectors
+              Row(
                 children: [
-                  Text(
-                    'Result',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  Expanded(
+                    child: UnitSelector(
+                      value: _fromUnit,
+                      units: _conversionService.getUnits(widget.converterType),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _fromUnit = value;
+                          });
+                          _convertLive(_sourceValue);
+                        }
+                      },
+                      label: '',
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  if (_isLoading)
-                    const CircularProgressIndicator()
-                  else if (_result.isNotEmpty)
+                  const SizedBox(width: 16),
+                  IconButton(
+                    onPressed: _swapUnits,
+                    icon: const Icon(Icons.swap_horiz),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: UnitSelector(
+                      value: _toUnit,
+                      units: _conversionService.getUnits(widget.converterType),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _toUnit = value;
+                          });
+                          _convertLive(_sourceValue);
+                        }
+                      },
+                      label: '',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              // Result area
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                     Text(
-                      _result,
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    )
-                  else
-                    Text(
-                      'Enter a value to convert',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      'Result',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Calculator section
-            CalculatorInput(
-              onExpressionEvaluated: (value) {
-                _inputController.text = value;
-                _convert();
-              },
-            ),
-            
-            const Spacer(),
-            
-            // Info section for currency
-            if (widget.converterType == ConverterType.currency)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Using mock exchange rates for demo. Real rates would come from API.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    const SizedBox(height: 8),
+                    if (_isLoading)
+                      const CircularProgressIndicator()
+                    else if (_result.isNotEmpty)
+                      Text(
+                        _result,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.primary,
                         ),
+                      )
+                    else
+                      Text(
+                        'Enter a value to convert',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
-          ],
+              const SizedBox(height: 16),
+              // Calculator section (scrollable)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: CalculatorInput(
+                    onExpressionEvaluated: (value) {
+                      _onCalculatorChanged(value);
+                    },
+                    onExpressionChanged: (value) {
+                      _onCalculatorChanged(value);
+                    },
+                  ),
+                ),
+              ),
+              
+              // Info section for currency
+              if (widget.converterType == ConverterType.currency) ...[
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Using mock exchange rates for demo. Real rates would come from API.',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
@@ -248,7 +253,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
 
   @override
   void dispose() {
-    _inputController.dispose();
     super.dispose();
   }
 } 
