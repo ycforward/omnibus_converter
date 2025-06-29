@@ -80,40 +80,12 @@ class CalculatorInputState extends State<CalculatorInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                _expression.isEmpty ? '0' : _expression,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500),
-                textAlign: TextAlign.right,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _result.isEmpty ? '' : '= $_result',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.right,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 320, // Fixed height for the calculator grid
+        Expanded(
           child: GridView.count(
             crossAxisCount: 4,
-            shrinkWrap: true,
+            shrinkWrap: false,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.2, // Better aspect ratio for buttons
+            childAspectRatio: 1.2,
             children: [
               _buildButton('7'),
               _buildButton('8'),

@@ -158,59 +158,80 @@ class _ConverterScreenState extends State<ConverterScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              // Result area
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Result',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+              // Source and target value boxes side by side
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 16, right: 8),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'From',
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _sourceValue.isEmpty ? '0' : _sourceValue,
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    if (_isLoading)
-                      const CircularProgressIndicator()
-                    else if (_result.isNotEmpty)
-                      Text(
-                        _result,
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      )
-                    else
-                      Text(
-                        'Enter a value to convert',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 16, left: 8),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
                         ),
                       ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Calculator section (scrollable)
-              Expanded(
-                child: SingleChildScrollView(
-                  child: CalculatorInput(
-                    onExpressionEvaluated: (value) {
-                      _onCalculatorChanged(value);
-                    },
-                    onExpressionChanged: (value) {
-                      _onCalculatorChanged(value);
-                    },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'To',
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Text(
+                                  _result.isEmpty ? '-' : _result,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                        ],
+                      ),
+                    ),
                   ),
+                ],
+              ),
+              // Calculator section fills all remaining space, no extra box above
+              Expanded(
+                child: CalculatorInput(
+                  onExpressionEvaluated: (value) {
+                    _onCalculatorChanged(value);
+                  },
+                  onExpressionChanged: (value) {
+                    _onCalculatorChanged(value);
+                  },
                 ),
               ),
               
