@@ -101,62 +101,48 @@ class UnitSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+    return Container(
+      constraints: const BoxConstraints(minWidth: 120),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
-        const SizedBox(height: 8),
-        Container(
-          constraints: const BoxConstraints(minWidth: 120),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: DropdownButtonFormField<String>(
+        value: value.isNotEmpty ? value : null,
+        items: units.map((unit) {
+          return DropdownMenuItem<String>(
+            value: unit,
+            child: Text(
+              _getUnitDisplay(unit),
+              style: TextStyle(
+                fontWeight: value == unit ? FontWeight.bold : FontWeight.normal,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
+          );
+        }).toList(),
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: DropdownButtonFormField<String>(
-            value: value.isNotEmpty ? value : null,
-            items: units.map((unit) {
-              return DropdownMenuItem<String>(
-                value: unit,
-                child: Text(
-                  _getUnitDisplay(unit),
-                  style: TextStyle(
-                    fontWeight: value == unit ? FontWeight.bold : FontWeight.normal,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            }).toList(),
-            onChanged: onChanged,
-            decoration: InputDecoration(
-              labelText: label,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-            ),
-            style: Theme.of(context).textTheme.titleMedium,
-            isExpanded: true,
-            isDense: true,
-            icon: Icon(
-              Icons.arrow_drop_down,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            dropdownColor: Theme.of(context).colorScheme.surface,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 0,
           ),
         ),
-      ],
+        style: Theme.of(context).textTheme.titleMedium,
+        isExpanded: true,
+        isDense: true,
+        icon: Icon(
+          Icons.arrow_drop_down,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        dropdownColor: Theme.of(context).colorScheme.surface,
+      ),
     );
   }
 } 

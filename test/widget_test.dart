@@ -12,6 +12,7 @@ import 'package:converter_app/main.dart';
 import 'package:converter_app/screens/converter_screen.dart';
 import 'package:converter_app/models/converter_type.dart';
 import 'package:converter_app/widgets/calculator_input.dart';
+import 'package:converter_app/widgets/unit_selector.dart';
 
 void main() {
   testWidgets('Home screen loads and shows conversion types', (WidgetTester tester) async {
@@ -128,5 +129,44 @@ void main() {
       // After popping, there should be no ConverterScreen
       expect(find.byType(ConverterScreen), findsNothing);
     }
+  });
+
+  testWidgets('UnitSelector renders compactly and is symmetric around swap icon', (WidgetTester tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: Column(
+          children: [
+            UnitSelector(
+              value: 'Meter',
+              units: ['Meter', 'Kilometer'],
+              onChanged: (_) {},
+              label: '',
+            ),
+            const SizedBox(height: 8),
+            const Icon(Icons.swap_horiz),
+            const SizedBox(height: 8),
+            UnitSelector(
+              value: 'Kilometer',
+              units: ['Meter', 'Kilometer'],
+              onChanged: (_) {},
+              label: '',
+            ),
+          ],
+        ),
+      ),
+    ));
+    // Check that both UnitSelectors are present
+    expect(find.byType(UnitSelector), findsNWidgets(2));
+    // Check that the swap icon is present
+    expect(find.byIcon(Icons.swap_horiz), findsOneWidget);
+    // Check that there is no overflow
+    expect(tester.takeException(), isNull);
+    // Optionally, check the heights above and below the icon are similar (within a tolerance)
+    final firstBox = tester.getTopLeft(find.byType(UnitSelector).first).dy;
+    final iconBox = tester.getTopLeft(find.byIcon(Icons.swap_horiz)).dy;
+    final secondBox = tester.getTopLeft(find.byType(UnitSelector).last).dy;
+    final above = iconBox - firstBox;
+    final below = secondBox - iconBox;
+    expect((above - below).abs(), lessThan(10), reason: 'Spacing above and below swap icon should be nearly equal');
   });
 }

@@ -129,7 +129,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     },
                     label: '',
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Center(
                     child: IconButton(
                       onPressed: _swapUnits,
@@ -139,7 +139,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   UnitSelector(
                     value: _toUnit,
                     units: _conversionService.getUnits(widget.converterType),
