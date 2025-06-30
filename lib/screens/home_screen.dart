@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'converter_screen.dart';
 import '../models/converter_type.dart';
+import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,13 +17,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Choose Conversion Type',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
             const SizedBox(height: 24),
             Expanded(
               child: GridView.builder(

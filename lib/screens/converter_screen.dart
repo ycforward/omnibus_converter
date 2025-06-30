@@ -113,47 +113,45 @@ class _ConverterScreenState extends State<ConverterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Unit selectors
-              Row(
+              // Unit selectors (now in separate rows)
+              Column(
                 children: [
-                  Expanded(
-                    child: UnitSelector(
-                      value: _fromUnit,
-                      units: _conversionService.getUnits(widget.converterType),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _fromUnit = value;
-                          });
-                          _convertLive(_sourceValue);
-                        }
-                      },
-                      label: '',
+                  UnitSelector(
+                    value: _fromUnit,
+                    units: _conversionService.getUnits(widget.converterType),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _fromUnit = value;
+                        });
+                        _convertLive(_sourceValue);
+                      }
+                    },
+                    label: '',
+                  ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: IconButton(
+                      onPressed: _swapUnits,
+                      icon: const Icon(Icons.swap_horiz),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  IconButton(
-                    onPressed: _swapUnits,
-                    icon: const Icon(Icons.swap_horiz),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: UnitSelector(
-                      value: _toUnit,
-                      units: _conversionService.getUnits(widget.converterType),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _toUnit = value;
-                          });
-                          _convertLive(_sourceValue);
-                        }
-                      },
-                      label: '',
-                    ),
+                  const SizedBox(height: 12),
+                  UnitSelector(
+                    value: _toUnit,
+                    units: _conversionService.getUnits(widget.converterType),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _toUnit = value;
+                        });
+                        _convertLive(_sourceValue);
+                      }
+                    },
+                    label: '',
                   ),
                 ],
               ),

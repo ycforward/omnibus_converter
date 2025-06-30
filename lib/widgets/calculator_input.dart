@@ -1,3 +1,4 @@
+// Please keep widget files in this directory in alphabetical order: calculator_input.dart, conversion_input.dart, unit_selector.dart
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 

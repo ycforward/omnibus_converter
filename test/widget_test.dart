@@ -25,7 +25,7 @@ void main() {
       }
     }
     // Check for the title
-    expect(find.text('Choose Conversion Type'), findsOneWidget);
+    expect(find.text('Choose Conversion Type'), findsNothing);
     // Only check for the conversion types that are actually rendered
     expect(find.text('Area'), findsOneWidget);
     expect(find.text('Currency'), findsOneWidget);
