@@ -7,6 +7,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sortedTypes = List<ConverterType>.from(ConverterType.values)
+      ..sort((a, b) => a.title.compareTo(b.title));
     return Scaffold(
       appBar: AppBar(
         title: const Text('Unit Converter'),
@@ -26,9 +28,10 @@ class HomeScreen extends StatelessWidget {
                   mainAxisSpacing: 16,
                   childAspectRatio: 0.95,
                 ),
-                itemCount: ConverterType.values.length,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: sortedTypes.length,
                 itemBuilder: (context, index) {
-                  final converterType = ConverterType.values[index];
+                  final converterType = sortedTypes[index];
                   return _ConverterCard(converterType: converterType);
                 },
               ),

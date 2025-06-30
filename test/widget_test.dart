@@ -16,6 +16,15 @@ import 'package:converter_app/widgets/unit_selector.dart';
 
 void main() {
   testWidgets('Home screen loads and shows conversion types', (WidgetTester tester) async {
+    // Set a large screen size for the test
+    final originalSize = tester.binding.window.physicalSize;
+    final originalRatio = tester.binding.window.devicePixelRatio;
+    tester.binding.window.physicalSizeTestValue = const Size(1200, 2400);
+    tester.binding.window.devicePixelRatioTestValue = 1.0;
+    addTearDown(() {
+      tester.binding.window.physicalSizeTestValue = originalSize;
+      tester.binding.window.devicePixelRatioTestValue = originalRatio;
+    });
     await tester.pumpWidget(const ConverterApp());
     // Print all visible text widgets for debugging
     final textWidgets = find.byType(Text);
@@ -27,11 +36,22 @@ void main() {
     }
     // Check for the title
     expect(find.text('Choose Conversion Type'), findsNothing);
+    // Scroll to the bottom to ensure all items are visible
+    await tester.drag(find.byType(GridView), const Offset(0, -1000));
+    await tester.pumpAndSettle();
     // Only check for the conversion types that are actually rendered
-    expect(find.text('Area'), findsOneWidget);
-    expect(find.text('Currency'), findsOneWidget);
-    expect(find.text('Length'), findsOneWidget);
-    expect(find.text('Temperature'), findsOneWidget);
+    final expectedTypes = ConverterType.values.map((e) => e.title).toList();
+    for (final type in expectedTypes) {
+      // Try to find the type after scrolling to the bottom
+      await tester.drag(find.byType(GridView), const Offset(0, -1000));
+      await tester.pumpAndSettle();
+      if (find.text(type).evaluate().isEmpty) {
+        // If not found, scroll to the top and check again
+        await tester.drag(find.byType(GridView), const Offset(0, 1000));
+        await tester.pumpAndSettle();
+      }
+      expect(find.text(type), findsWidgets, reason: 'Type "$type" should be visible after scrolling');
+    }
   });
 
   testWidgets('UnitSelector does not overflow', (WidgetTester tester) async {
