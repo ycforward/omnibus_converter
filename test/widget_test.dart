@@ -218,5 +218,47 @@ void main() {
       expect(service.convert(ConverterType.energy, 1, 'Kilowatt Hour', 'Joule'), closeTo(3600000, 0.01));
       expect(service.convert(ConverterType.energy, 3600, 'Joule', 'Watt Hour'), closeTo(1, 0.01));
     });
+
+    test('area conversions', () {
+      expect(service.convert(ConverterType.area, 1, 'Square Kilometer', 'Square Meter'), closeTo(1000000, 0.01));
+      expect(service.convert(ConverterType.area, 4046.86, 'Square Meter', 'Acre'), closeTo(1, 0.01));
+      expect(service.convert(ConverterType.area, 2, 'Acre', 'Square Foot'), closeTo(2 * 4046.86 / 0.092903, 0.1));
+    });
+
+    test('currency conversions', () {
+      expect(service.convert(ConverterType.currency, 1, 'USD', 'EUR'), closeTo(0.85, 0.01));
+      expect(service.convert(ConverterType.currency, 110, 'JPY', 'USD'), closeTo(1, 0.01));
+      expect(service.convert(ConverterType.currency, 1, 'GBP', 'INR'), closeTo(1 / 0.73 * 74.5, 0.1));
+    });
+
+    test('length conversions', () {
+      expect(service.convert(ConverterType.length, 1, 'Kilometer', 'Meter'), closeTo(1000, 0.01));
+      expect(service.convert(ConverterType.length, 2, 'Mile', 'Kilometer'), closeTo(2 * 1609.344 / 1000, 0.01));
+      expect(service.convert(ConverterType.length, 12, 'Inch', 'Foot'), closeTo(1, 0.01));
+    });
+
+    test('temperature conversions', () {
+      expect(service.convert(ConverterType.temperature, 0, 'Celsius', 'Fahrenheit'), closeTo(32, 0.01));
+      expect(service.convert(ConverterType.temperature, 273.15, 'Kelvin', 'Celsius'), closeTo(0, 0.01));
+      expect(service.convert(ConverterType.temperature, 100, 'Celsius', 'Kelvin'), closeTo(373.15, 0.01));
+    });
+
+    test('volume conversions', () {
+      expect(service.convert(ConverterType.volume, 1, 'Gallon', 'Liter'), closeTo(3.78541, 0.01));
+      expect(service.convert(ConverterType.volume, 1000, 'Milliliter', 'Liter'), closeTo(1, 0.01));
+      expect(service.convert(ConverterType.volume, 2, 'Quart', 'Pint'), closeTo(2 * 0.946353 / 0.473176, 0.01));
+    });
+
+    test('weight conversions', () {
+      expect(service.convert(ConverterType.weight, 1, 'Kilogram', 'Gram'), closeTo(1000, 0.01));
+      expect(service.convert(ConverterType.weight, 2.20462, 'Pound', 'Kilogram'), closeTo(2.20462 * 0.453592, 0.01));
+      expect(service.convert(ConverterType.weight, 16, 'Ounce', 'Pound'), closeTo(16 * 0.0283495 / 0.453592, 0.01));
+    });
+
+    test('speed conversions', () {
+      expect(service.convert(ConverterType.speed, 1, 'Miles per Hour', 'Kilometers per Hour'), closeTo(1 * 0.44704 / 0.277778, 0.01));
+      expect(service.convert(ConverterType.speed, 10, 'Knots', 'Miles per Hour'), closeTo(10 * 0.514444 / 0.44704, 0.01));
+      expect(service.convert(ConverterType.speed, 3.28084, 'Feet per Second', 'Meters per Second'), closeTo(3.28084 * 0.3048, 0.01));
+    });
   });
 }
