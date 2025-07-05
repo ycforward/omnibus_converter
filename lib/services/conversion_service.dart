@@ -61,13 +61,13 @@ class ConversionService {
       case ConverterType.speed:
         return _convertSpeed(value, fromUnit, toUnit);
       case ConverterType.cooking:
-        throw UnimplementedError('Cooking conversion not implemented yet');
+        return _convertCooking(value, fromUnit, toUnit);
       case ConverterType.angle:
-        throw UnimplementedError('Angle conversion not implemented yet');
+        return _convertAngle(value, fromUnit, toUnit);
       case ConverterType.density:
-        throw UnimplementedError('Density conversion not implemented yet');
+        return _convertDensity(value, fromUnit, toUnit);
       case ConverterType.energy:
-        throw UnimplementedError('Energy conversion not implemented yet');
+        return _convertEnergy(value, fromUnit, toUnit);
     }
   }
 
@@ -259,6 +259,124 @@ class ConversionService {
       case 'Knots': return mps / 0.514444;
       case 'Feet per Second': return mps / 0.3048;
       default: throw Exception('Invalid speed unit');
+    }
+  }
+
+  // --- Cooking conversions (volume) ---
+  double _convertCooking(double value, String fromUnit, String toUnit) {
+    // Convert to milliliters first
+    double ml = _cookingToMl(value, fromUnit);
+    return _mlToCooking(ml, toUnit);
+  }
+
+  double _cookingToMl(double value, String unit) {
+    switch (unit) {
+      case 'Milliliter': return value;
+      case 'Liter': return value * 1000;
+      case 'Cup': return value * 240;
+      case 'Pint': return value * 473.176;
+      case 'Quart': return value * 946.353;
+      case 'Gallon': return value * 3785.41;
+      case 'Fluid Ounce': return value * 29.5735;
+      case 'Tablespoon': return value * 14.7868;
+      case 'Teaspoon': return value * 4.92892;
+      default: throw Exception('Invalid cooking unit');
+    }
+  }
+
+  double _mlToCooking(double ml, String unit) {
+    switch (unit) {
+      case 'Milliliter': return ml;
+      case 'Liter': return ml / 1000;
+      case 'Cup': return ml / 240;
+      case 'Pint': return ml / 473.176;
+      case 'Quart': return ml / 946.353;
+      case 'Gallon': return ml / 3785.41;
+      case 'Fluid Ounce': return ml / 29.5735;
+      case 'Tablespoon': return ml / 14.7868;
+      case 'Teaspoon': return ml / 4.92892;
+      default: throw Exception('Invalid cooking unit');
+    }
+  }
+
+  // --- Angle conversions ---
+  double _convertAngle(double value, String fromUnit, String toUnit) {
+    // Convert to degrees first
+    double degrees = _angleToDegrees(value, fromUnit);
+    return _degreesToAngle(degrees, toUnit);
+  }
+
+  double _angleToDegrees(double value, String unit) {
+    switch (unit) {
+      case 'Degree': return value;
+      case 'Radian': return value * 180 / 3.141592653589793;
+      case 'Gradian': return value * 0.9;
+      default: throw Exception('Invalid angle unit');
+    }
+  }
+
+  double _degreesToAngle(double degrees, String unit) {
+    switch (unit) {
+      case 'Degree': return degrees;
+      case 'Radian': return degrees * 3.141592653589793 / 180;
+      case 'Gradian': return degrees / 0.9;
+      default: throw Exception('Invalid angle unit');
+    }
+  }
+
+  // --- Density conversions ---
+  double _convertDensity(double value, String fromUnit, String toUnit) {
+    // Convert to kg/m³ first
+    double kgm3 = _densityToKgm3(value, fromUnit);
+    return _kgm3ToDensity(kgm3, toUnit);
+  }
+
+  double _densityToKgm3(double value, String unit) {
+    switch (unit) {
+      case 'Kilogram per Cubic Meter': return value;
+      case 'Gram per Cubic Centimeter': return value * 1000;
+      case 'Pound per Cubic Foot': return value * 16.0185;
+      default: throw Exception('Invalid density unit');
+    }
+  }
+
+  double _kgm3ToDensity(double kgm3, String unit) {
+    switch (unit) {
+      case 'Kilogram per Cubic Meter': return kgm3;
+      case 'Gram per Cubic Centimeter': return kgm3 / 1000;
+      case 'Pound per Cubic Foot': return kgm3 / 16.0185;
+      default: throw Exception('Invalid density unit');
+    }
+  }
+
+  // --- Energy conversions ---
+  double _convertEnergy(double value, String fromUnit, String toUnit) {
+    // Convert to joules first
+    double joules = _energyToJoules(value, fromUnit);
+    return _joulesToEnergy(joules, toUnit);
+  }
+
+  double _energyToJoules(double value, String unit) {
+    switch (unit) {
+      case 'Joule': return value;
+      case 'Kilojoule': return value * 1000;
+      case 'Calorie': return value * 4.184;
+      case 'Kilocalorie': return value * 4184;
+      case 'Watt Hour': return value * 3600;
+      case 'Kilowatt Hour': return value * 3600000;
+      default: throw Exception('Invalid energy unit');
+    }
+  }
+
+  double _joulesToEnergy(double joules, String unit) {
+    switch (unit) {
+      case 'Joule': return joules;
+      case 'Kilojoule': return joules / 1000;
+      case 'Calorie': return joules / 4.184;
+      case 'Kilocalorie': return joules / 4184;
+      case 'Watt Hour': return joules / 3600;
+      case 'Kilowatt Hour': return joules / 3600000;
+      default: throw Exception('Invalid energy unit');
     }
   }
 } 

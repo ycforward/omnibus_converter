@@ -13,6 +13,7 @@ import 'package:converter_app/screens/converter_screen.dart';
 import 'package:converter_app/models/converter_type.dart';
 import 'package:converter_app/widgets/calculator_input.dart';
 import 'package:converter_app/widgets/unit_selector.dart';
+import 'package:converter_app/services/conversion_service.dart';
 
 void main() {
   testWidgets('Home screen loads and shows conversion types', (WidgetTester tester) async {
@@ -188,5 +189,34 @@ void main() {
     final above = iconBox - firstBox;
     final below = secondBox - iconBox;
     expect((above - below).abs(), lessThan(10), reason: 'Spacing above and below swap icon should be nearly equal');
+  });
+
+  group('ConversionService', () {
+    final service = ConversionService();
+
+    test('cooking conversions', () {
+      expect(service.convert(ConverterType.cooking, 1, 'Cup', 'Milliliter'), closeTo(240, 0.01));
+      expect(service.convert(ConverterType.cooking, 2, 'Tablespoon', 'Teaspoon'), closeTo(2 * 14.7868 / 4.92892, 0.01));
+      expect(service.convert(ConverterType.cooking, 1, 'Gallon', 'Liter'), closeTo(3.78541, 0.01));
+    });
+
+    test('angle conversions', () {
+      expect(service.convert(ConverterType.angle, 180, 'Degree', 'Radian'), closeTo(3.14159, 0.01));
+      expect(service.convert(ConverterType.angle, 200, 'Gradian', 'Degree'), closeTo(180, 0.01));
+      expect(service.convert(ConverterType.angle, 1, 'Radian', 'Degree'), closeTo(57.2958, 0.01));
+    });
+
+    test('density conversions', () {
+      expect(service.convert(ConverterType.density, 1, 'Gram per Cubic Centimeter', 'Kilogram per Cubic Meter'), closeTo(1000, 0.01));
+      expect(service.convert(ConverterType.density, 16.0185, 'Kilogram per Cubic Meter', 'Pound per Cubic Foot'), closeTo(1, 0.01));
+      expect(service.convert(ConverterType.density, 2, 'Pound per Cubic Foot', 'Gram per Cubic Centimeter'), closeTo(2 * 16.0185 / 1000, 0.01));
+    });
+
+    test('energy conversions', () {
+      expect(service.convert(ConverterType.energy, 1, 'Kilojoule', 'Joule'), closeTo(1000, 0.01));
+      expect(service.convert(ConverterType.energy, 1, 'Calorie', 'Joule'), closeTo(4.184, 0.01));
+      expect(service.convert(ConverterType.energy, 1, 'Kilowatt Hour', 'Joule'), closeTo(3600000, 0.01));
+      expect(service.convert(ConverterType.energy, 3600, 'Joule', 'Watt Hour'), closeTo(1, 0.01));
+    });
   });
 }
