@@ -1,24 +1,15 @@
 import '../models/converter_type.dart';
+import 'exchange_rate_service.dart';
 
 class ConversionService {
-  // Mock exchange rates (in real app, these would come from API)
-  static const Map<String, double> _mockExchangeRates = {
-    'USD': 1.0,
-    'EUR': 0.85,
-    'GBP': 0.73,
-    'JPY': 110.0,
-    'CAD': 1.25,
-    'AUD': 1.35,
-    'CHF': 0.92,
-    'CNY': 6.45,
-    'INR': 74.5,
-    'BRL': 5.2,
-  };
+  // Exchange rates will be fetched from API
+  Map<String, double>? _exchangeRates;
+  bool _isLoadingRates = false;
 
   List<String> getUnits(ConverterType type) {
     switch (type) {
       case ConverterType.currency:
-        return _mockExchangeRates.keys.toList();
+        return _getCurrencyUnits();
       case ConverterType.length:
         return ['Meter', 'Kilometer', 'Centimeter', 'Millimeter', 'Mile', 'Yard', 'Foot', 'Inch'];
       case ConverterType.weight:
@@ -42,12 +33,12 @@ class ConversionService {
     }
   }
 
-  double convert(ConverterType type, double value, String fromUnit, String toUnit) {
+  Future<double> convert(ConverterType type, double value, String fromUnit, String toUnit) async {
     if (fromUnit == toUnit) return value;
 
     switch (type) {
       case ConverterType.currency:
-        return _convertCurrency(value, fromUnit, toUnit);
+        return await _convertCurrency(value, fromUnit, toUnit);
       case ConverterType.length:
         return _convertLength(value, fromUnit, toUnit);
       case ConverterType.weight:
@@ -71,12 +62,33 @@ class ConversionService {
     }
   }
 
-  double _convertCurrency(double value, String fromUnit, String toUnit) {
-    final fromRate = _mockExchangeRates[fromUnit];
-    final toRate = _mockExchangeRates[toUnit];
+  List<String> _getCurrencyUnits() {
+    // Return a default list of currencies if rates haven't been loaded yet
+    if (_exchangeRates == null) {
+      return ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL'];
+    }
+    return _exchangeRates!.keys.toList();
+  }
+
+  Future<void> _ensureExchangeRatesLoaded() async {
+    if (_exchangeRates == null && !_isLoadingRates) {
+      _isLoadingRates = true;
+      try {
+        _exchangeRates = await ExchangeRateService.getExchangeRates();
+      } finally {
+        _isLoadingRates = false;
+      }
+    }
+  }
+
+  Future<double> _convertCurrency(double value, String fromUnit, String toUnit) async {
+    await _ensureExchangeRatesLoaded();
+    
+    final fromRate = _exchangeRates?[fromUnit];
+    final toRate = _exchangeRates?[toUnit];
     
     if (fromRate == null || toRate == null) {
-      throw Exception('Invalid currency unit');
+      throw Exception('Invalid currency unit: $fromUnit or $toUnit');
     }
     
     // Convert to USD first, then to target currency

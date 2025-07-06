@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/converter_type.dart';
 import '../services/conversion_service.dart';
+import '../services/exchange_rate_service.dart';
 import '../widgets/conversion_input.dart';
 import '../widgets/unit_selector.dart';
 import '../widgets/calculator_input.dart';
@@ -61,33 +62,32 @@ class _ConverterScreenState extends State<ConverterScreen> {
     setState(() {
       _isLoading = true;
     });
-    if (widget.converterType == ConverterType.currency) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _performConversion(input);
-      });
-    } else {
-      _performConversion(input);
-    }
+    
+    _performConversion(input);
   }
 
-  void _performConversion(double input) {
+  Future<void> _performConversion(double input) async {
     try {
-      final result = _conversionService.convert(
+      final result = await _conversionService.convert(
         widget.converterType,
         input,
         _fromUnit,
         _toUnit,
       );
       
-      setState(() {
-        _result = result.toStringAsFixed(4);
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _result = result.toStringAsFixed(4);
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _result = 'Error: $e';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _result = 'Error: $e';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -253,7 +253,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Using mock exchange rates for demo. Real rates would come from API.',
+                          ExchangeRateService.isUsingRealApi
+                              ? 'Using real-time exchange rates from UniRateAPI'
+                              : 'Using mock exchange rates. Add your API key to .env file for real rates.',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                           ),
