@@ -10,7 +10,7 @@ The app now supports real-time currency exchange rates using the UniRateAPI. Whe
 
 ### 1. Get a UniRateAPI Key
 
-1. Visit [UniRateAPI](https://unirate.com) and sign up for an account
+1. Visit [UniRateAPI](https://unirateapi.com) and sign up for an account
 2. Navigate to your dashboard and generate an API key
 3. Copy the API key for use in the app
 
@@ -22,7 +22,7 @@ The app now supports real-time currency exchange rates using the UniRateAPI. Whe
 ```env
 # UniRateAPI Configuration
 UNIRATE_API_KEY=your_actual_api_key_here
-UNIRATE_BASE_URL=https://api.unirate.com/v1
+UNIRATE_BASE_URL=https://api.unirateapi.com/v1
 ```
 
 ### 3. Install Dependencies

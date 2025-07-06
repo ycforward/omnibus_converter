@@ -7,7 +7,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Load environment variables
-  await dotenv.load(fileName: ".env");
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    print('Warning: Could not load .env file: $e');
+    // Continue without .env file - will use mock rates
+  }
   
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

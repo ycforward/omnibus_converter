@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ExchangeRateService {
-  static const String _baseUrl = 'https://api.unirate.com/v1';
+  static const String _baseUrl = 'https://api.unirateapi.com/api';
   static const Duration _cacheDuration = Duration(hours: 1);
   
   static Map<String, double> _cachedRates = {};
@@ -36,9 +36,8 @@ class ExchangeRateService {
       }
 
       final response = await http.get(
-        Uri.parse('$_baseUrl/latest'),
+        Uri.parse('$_baseUrl/rates?api_key=$apiKey&from=USD'),
         headers: {
-          'Authorization': 'Bearer $apiKey',
           'Content-Type': 'application/json',
         },
       ).timeout(const Duration(seconds: 10));
@@ -96,7 +95,7 @@ class ExchangeRateService {
   static Map<String, double> _parseExchangeRates(Map<String, dynamic> data) {
     final rates = <String, double>{};
     
-    // Handle different API response formats
+    // Handle UniRateAPI response format
     if (data.containsKey('rates')) {
       final ratesData = data['rates'] as Map<String, dynamic>;
       ratesData.forEach((currency, rate) {
@@ -104,16 +103,6 @@ class ExchangeRateService {
           rates[currency] = rate.toDouble();
         }
       });
-    } else if (data.containsKey('data')) {
-      final dataObj = data['data'] as Map<String, dynamic>;
-      if (dataObj.containsKey('rates')) {
-        final ratesData = dataObj['rates'] as Map<String, dynamic>;
-        ratesData.forEach((currency, rate) {
-          if (rate is num) {
-            rates[currency] = rate.toDouble();
-          }
-        });
-      }
     }
     
     // Always include USD as base currency
