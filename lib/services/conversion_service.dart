@@ -1,5 +1,6 @@
 import '../models/converter_type.dart';
 import 'exchange_rate_service.dart';
+import 'currency_service.dart';
 
 class ConversionService {
   // Exchange rates will be fetched from API
@@ -65,7 +66,7 @@ class ConversionService {
   List<String> _getCurrencyUnits() {
     // Return a default list of currencies if rates haven't been loaded yet
     if (_exchangeRates == null) {
-      return ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL'];
+      return CurrencyService.getDefaultCurrencies();
     }
     return _exchangeRates!.keys.toList();
   }

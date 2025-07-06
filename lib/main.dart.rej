@@ -1,0 +1,41 @@
+diff a/lib/main.dart b/lib/main.dart	(rejected hunks)
+@@ -1,18 +1,37 @@
+ import 'package:flutter/material.dart';
+ import 'package:flutter/services.dart';
+ import 'screens/home_screen.dart';
++import 'dart:io';
+ 
+ void main() async {
+   WidgetsFlutterBinding.ensureInitialized();
++  print('Current directory: \\${Directory.current.path}');
++  FlutterError.onError = (FlutterErrorDetails details) {
++    FlutterError.dumpErrorToConsole(details);
++    print('FlutterError:');
++    print(details.exceptionAsString());
++    print(details.stack);
++  };
++  print('Loading key from .unirateapi_key');
++  String unirateApiKey = '';
++  try {
++    unirateApiKey = await File(".unirateapi_key").readAsString();
++    unirateApiKey = unirateApiKey.trim();
++    print('Loaded key from .unirateapi_key');
++  } catch (e2) {
++    print('Failed to load key from .unirateapi_key: $e2');
++  }
+   await SystemChrome.setPreferredOrientations([
+     DeviceOrientation.portraitUp,
+     DeviceOrientation.portraitDown,
+   ]);
+-  runApp(const ConverterApp());
++  print('Orientation set, running app');
++  runApp(ConverterApp(apiKey: unirateApiKey));
+ }
+ 
+ class ConverterApp extends StatelessWidget {
+-  const ConverterApp({super.key});
++  final String apiKey;
++  const ConverterApp({Key? key, required this.apiKey}) : super(key: key);
+ 
+   @override
+   Widget build(BuildContext context) {

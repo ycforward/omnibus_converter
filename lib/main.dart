@@ -6,12 +6,28 @@ import 'screens/home_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Load environment variables
+  // Load environment variables with comprehensive error handling
+  bool envLoaded = false;
   try {
     await dotenv.load(fileName: ".env");
+    print('Successfully loaded .env file');
+    envLoaded = true;
   } catch (e) {
     print('Warning: Could not load .env file: $e');
-    // Continue without .env file - will use mock rates
+    print('App will continue with mock exchange rates');
+  }
+  
+  // Ensure dotenv is initialized even if file loading fails
+  if (!dotenv.isInitialized) {
+    dotenv.env.clear();
+  }
+  
+  // Set default values to prevent any crashes
+  if (!envLoaded || dotenv.env['UNIRATE_API_KEY'] == null) {
+    dotenv.env['UNIRATE_API_KEY'] = 'mock_key';
+  }
+  if (!envLoaded || dotenv.env['UNIRATE_BASE_URL'] == null) {
+    dotenv.env['UNIRATE_BASE_URL'] = 'https://api.unirateapi.com/api';
   }
   
   await SystemChrome.setPreferredOrientations([

@@ -1,0 +1,27 @@
+diff a/lib/screens/converter_screen.dart b/lib/screens/converter_screen.dart	(rejected hunks)
+@@ -61,24 +64,13 @@ class _ConverterScreenState extends State<ConverterScreen> {
+     setState(() {
+       _isLoading = true;
+     });
+-    if (widget.converterType == ConverterType.currency) {
+-      Future.delayed(const Duration(milliseconds: 500), () {
+-        _performConversion(input);
+-      });
+-    } else {
+-      _performConversion(input);
+-    }
+-  }
+-
+-  void _performConversion(double input) {
+     try {
+-      final result = _conversionService.convert(
++      final result = await widget.conversionService.convert(
+         widget.converterType,
+         input,
+         _fromUnit,
+         _toUnit,
+       );
+-      
+       setState(() {
+         _result = result.toStringAsFixed(4);
+         _isLoading = false;
