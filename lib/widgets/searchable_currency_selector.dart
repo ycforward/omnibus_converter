@@ -65,6 +65,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isOpen = false;
+  bool _isDisposing = false;
   List<String> _filteredCurrencies = [];
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
@@ -84,9 +85,12 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
 
   @override
   void dispose() {
+    _isDisposing = true;
+    // Remove overlay first before disposing other resources
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     _searchController.dispose();
     _focusNode.dispose();
-    _removeOverlay();
     super.dispose();
   }
 
@@ -95,6 +99,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
   }
 
   void _filterCurrencies(String query) {
+    if (_isDisposing) return;
     setState(() {
       if (query.isEmpty) {
         _filteredCurrencies = _getSortedCurrencies();
@@ -127,19 +132,22 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
   }
 
   void _showOverlay() {
-    if (_overlayEntry != null) return;
+    if (_overlayEntry != null || _isDisposing) return;
     
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
-    setState(() {
-      _isOpen = true;
-    });
+    if (mounted && !_isDisposing) {
+      setState(() {
+        _isOpen = true;
+      });
+    }
   }
 
   void _removeOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    if (mounted) {
+    // Only setState if the widget is still mounted and not being disposed
+    if (mounted && !_isDisposing) {
       setState(() {
         _isOpen = false;
       });
@@ -269,13 +277,14 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
             // Star toggle
             InkWell(
               onTap: () async {
+                if (_isDisposing) return;
                 final newStarredStatus = await CurrencyPreferencesService.toggleStarred(currency);
-                setState(() {
-                  _filteredCurrencies = _getSortedCurrencies();
-                });
-                _updateOverlay();
-                
-                if (mounted) {
+                if (mounted && !_isDisposing) {
+                  setState(() {
+                    _filteredCurrencies = _getSortedCurrencies();
+                  });
+                  _updateOverlay();
+                  
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
