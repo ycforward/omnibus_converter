@@ -166,7 +166,7 @@ class TestHelpers {
 
 /// Mock ExchangeRateService for testing
 class MockExchangeRateService {
-  static Map<String, double> _mockRates = {
+  static Map<String, double> _testRates = {
     'USD': 1.0,
     'EUR': 0.85,
     'GBP': 0.73,
@@ -180,14 +180,14 @@ class MockExchangeRateService {
   };
 
   static Future<Map<String, double>> getExchangeRates() async {
-    return _mockRates;
+    return _testRates;
   }
 
   static Future<double?> getExchangeRate(String fromCurrency, String toCurrency) async {
     if (fromCurrency == toCurrency) return 1.0;
     
-    final fromRate = _mockRates[fromCurrency];
-    final toRate = _mockRates[toCurrency];
+    final fromRate = _testRates[fromCurrency];
+    final toRate = _testRates[toCurrency];
     
     if (fromRate == null || toRate == null) {
       return null;

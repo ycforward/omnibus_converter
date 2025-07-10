@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ExchangeRateService {
   static const String _baseUrl = 'https://api.unirateapi.com/api';
-  static const Duration _cacheDuration = Duration(hours: 6); // Reduced to 6 hours for more frequent updates
+  static const Duration _cacheDuration = Duration(minutes: 10); // 10 minute cache for fresh rates
   static const String _cacheKey = 'exchange_rates_cache';
   static const String _cacheTimeKey = 'exchange_rates_cache_time';
   
@@ -34,10 +34,7 @@ class ExchangeRateService {
       await _fetchFreshRates();
     } catch (e) {
       print('Error during preload: $e');
-      // Ensure we have fallback rates available
-      if (_cachedRates.isEmpty) {
-        _cachedRates = _getMockRates();
-      }
+      // Keep any existing cached rates, don't add mock rates
     } finally {
       _isPreloading = false;
     }
@@ -55,7 +52,7 @@ class ExchangeRateService {
       while (_isLoading) {
         await Future.delayed(const Duration(milliseconds: 50));
       }
-      return _cachedRates.isNotEmpty ? _cachedRates : _getMockRates();
+      return _cachedRates;
     }
 
     // Load from persistent cache first
@@ -68,7 +65,7 @@ class ExchangeRateService {
       await _fetchFreshRates();
     }
 
-    return _cachedRates.isNotEmpty ? _cachedRates : _getMockRates();
+    return _cachedRates;
   }
 
   /// Load cached rates from SharedPreferences
@@ -117,11 +114,8 @@ class ExchangeRateService {
     try {
       final apiKey = dotenv.env['UNIRATE_API_KEY'];
       if (apiKey == null || apiKey.isEmpty || apiKey == 'your_api_key_here' || apiKey == 'mock_key') {
-        // Use mock rates if no valid API key
-        _cachedRates = _getMockRates();
-        _lastFetchTime = DateTime.now();
-        await _saveToPersistentCache();
-        print('Using mock exchange rates (no valid API key)');
+        // Don't set mock rates, just return - keep any existing cached rates
+        print('No valid API key configured, keeping existing cached rates');
         return;
       }
 
@@ -144,19 +138,11 @@ class ExchangeRateService {
         print('Fetched ${rates.length} fresh exchange rates from API');
       } else {
         print('API Error: ${response.statusCode} - ${response.body}');
-        // Keep existing cache if available, otherwise use mock rates
-        if (_cachedRates.isEmpty) {
-          _cachedRates = _getMockRates();
-          _lastFetchTime = DateTime.now();
-        }
+        // Keep existing cache if available, don't add mock rates
       }
     } catch (e) {
       print('Error fetching fresh exchange rates: $e');
-      // Keep existing cache if available, otherwise use mock rates
-      if (_cachedRates.isEmpty) {
-        _cachedRates = _getMockRates();
-        _lastFetchTime = DateTime.now();
-      }
+      // Keep existing cache if available, don't add mock rates
     } finally {
       _isLoading = false;
     }
@@ -209,26 +195,7 @@ class ExchangeRateService {
     return rates;
   }
 
-  /// Get mock exchange rates as fallback
-  static Map<String, double> _getMockRates() {
-    return {
-      'USD': 1.0,
-      'EUR': 0.85,
-      'GBP': 0.73,
-      'JPY': 110.0,
-      'CAD': 1.25,
-      'AUD': 1.35,
-      'CHF': 0.92,
-      'CNY': 6.45,
-      'INR': 74.5,
-      'BRL': 5.2,
-      'KRW': 1180.0,
-      'MXN': 17.8,
-      'SEK': 9.2,
-      'NOK': 9.8,
-      'SGD': 1.35,
-    };
-  }
+
 
   /// Clear cache to force fresh data fetch
   static Future<void> clearCache() async {
@@ -261,6 +228,24 @@ class ExchangeRateService {
 
   /// Check if we have cached rates available
   static bool get hasCachedRates => _cachedRates.isNotEmpty;
+
+  /// Get formatted fetch time for display
+  static String? getLastFetchTimeFormatted() {
+    if (_lastFetchTime == null) return null;
+    
+    final now = DateTime.now();
+    final diff = now.difference(_lastFetchTime!);
+    
+    if (diff.inMinutes < 1) {
+      return 'Exchange rates updated just now';
+    } else if (diff.inMinutes < 60) {
+      return 'Exchange rates updated ${diff.inMinutes} minute${diff.inMinutes == 1 ? '' : 's'} ago';
+    } else if (diff.inHours < 24) {
+      return 'Exchange rates updated ${diff.inHours} hour${diff.inHours == 1 ? '' : 's'} ago';
+    } else {
+      return 'Exchange rates updated ${diff.inDays} day${diff.inDays == 1 ? '' : 's'} ago';
+    }
+  }
 
   /// Get current cache status for debugging
   static Map<String, dynamic> getCacheStatus() {

@@ -33,8 +33,15 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _initializeUnits() {
     final units = _conversionService.getUnits(widget.converterType);
     if (units.isNotEmpty) {
-      _fromUnit = units.first;
-      _toUnit = units.length > 1 ? units[1] : units.first;
+      if (widget.converterType == ConverterType.currency) {
+        // Set default currency conversion to USD → CNY
+        _fromUnit = units.contains('USD') ? 'USD' : units.first;
+        _toUnit = units.contains('CNY') ? 'CNY' : (units.length > 1 ? units[1] : units.first);
+      } else {
+        // For other conversions, use first two units
+        _fromUnit = units.first;
+        _toUnit = units.length > 1 ? units[1] : units.first;
+      }
     }
   }
 
@@ -246,16 +253,15 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.info_outline,
+                        Icons.update,
                         size: 20,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          ExchangeRateService.isUsingRealApi
-                              ? 'Using real-time exchange rates from UniRateAPI'
-                              : 'Using mock exchange rates. Add your API key to .env file for real rates.',
+                          ExchangeRateService.getLastFetchTimeFormatted() ??
+                              'No exchange rates available. Please check your internet connection.',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                           ),

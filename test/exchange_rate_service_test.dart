@@ -15,37 +15,36 @@ void main() {
     });
 
     group('getExchangeRates', () {
-      test('should return mock rates when no API key is configured', () async {
-        // Ensure no API key is set
+      test('should return empty map when no API key is configured and no cache', () async {
+        // Ensure no API key is set and clear cache
         dotenv.env['UNIRATE_API_KEY'] = 'your_api_key_here';
+        await ExchangeRateService.clearCache();
         
         final rates = await ExchangeRateService.getExchangeRates();
         
-        expect(rates, isNotEmpty);
-        expect(rates['USD'], equals(1.0));
-        expect(rates['EUR'], isNotNull);
-        expect(rates['GBP'], isNotNull);
-        expect(rates['JPY'], isNotNull);
+        expect(rates, isEmpty);
       });
 
       test('should cache rates and return cached data on subsequent calls', () async {
-        // Ensure no API key is set to use mock data
+        // Ensure no API key is set and start with empty cache
         dotenv.env['UNIRATE_API_KEY'] = 'your_api_key_here';
+        await ExchangeRateService.clearCache();
         
         final firstCall = await ExchangeRateService.getExchangeRates();
         final secondCall = await ExchangeRateService.getExchangeRates();
         
         expect(firstCall, equals(secondCall));
-        expect(firstCall['USD'], equals(1.0));
+        expect(firstCall, isEmpty); // With no API key and no cache, should be empty
       });
 
       test('should handle invalid API key gracefully', () async {
         dotenv.env['UNIRATE_API_KEY'] = 'invalid_key';
+        await ExchangeRateService.clearCache();
         
         final rates = await ExchangeRateService.getExchangeRates();
         
-        expect(rates, isNotEmpty);
-        expect(rates['USD'], equals(1.0));
+        // Should keep existing cache or be empty if no cache exists
+        expect(rates, isA<Map<String, double>>());
       });
     });
 
@@ -56,12 +55,12 @@ void main() {
       });
 
       test('should calculate exchange rate between different currencies', () async {
-        // Ensure no API key is set to use mock data
+        // This test now expects null for currencies not in cache
         dotenv.env['UNIRATE_API_KEY'] = 'your_api_key_here';
+        await ExchangeRateService.clearCache();
         
         final rate = await ExchangeRateService.getExchangeRate('USD', 'EUR');
-        expect(rate, isNotNull);
-        expect(rate, greaterThan(0));
+        expect(rate, isNull); // No cache, no API key, should return null
       });
 
       test('should return null for invalid currencies', () async {
@@ -89,32 +88,24 @@ void main() {
 
     group('clearCache', () {
       test('should clear cached rates', () async {
-        // Ensure no API key is set to use mock data
-        dotenv.env['UNIRATE_API_KEY'] = 'your_api_key_here';
+        // Clear cache and verify it's empty
+        await ExchangeRateService.clearCache();
         
-        // First call to populate cache
-        await ExchangeRateService.getExchangeRates();
-        
-        // Clear cache
-        ExchangeRateService.clearCache();
-        
-        // Second call should fetch fresh data
-        final rates = await ExchangeRateService.getExchangeRates();
-        expect(rates, isNotEmpty);
-        expect(rates['USD'], equals(1.0));
+        final status = ExchangeRateService.getCacheStatus();
+        expect(status['hasCache'], false);
+        expect(status['cacheSize'], 0);
       });
     });
 
-    group('API response parsing', () {
-      test('should return valid mock rates structure', () async {
-        // Ensure no API key is set to use mock data
-        dotenv.env['UNIRATE_API_KEY'] = 'your_api_key_here';
+    group('Cache status', () {
+      test('should handle cache status correctly', () async {
+        await ExchangeRateService.clearCache();
         
-        final rates = await ExchangeRateService.getExchangeRates();
-        expect(rates['USD'], equals(1.0));
-        expect(rates['EUR'], equals(0.85));
-        expect(rates['GBP'], equals(0.73));
-        expect(rates['JPY'], equals(110.0));
+        final status = ExchangeRateService.getCacheStatus();
+        expect(status, isA<Map<String, dynamic>>());
+        expect(status.containsKey('hasCache'), isTrue);
+        expect(status.containsKey('cacheSize'), isTrue);
+        expect(status.containsKey('isValid'), isTrue);
       });
     });
   });
