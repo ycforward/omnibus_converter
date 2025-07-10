@@ -4,6 +4,7 @@ import '../services/conversion_service.dart';
 import '../services/exchange_rate_service.dart';
 import '../widgets/conversion_input.dart';
 import '../widgets/unit_selector.dart';
+import '../widgets/searchable_currency_selector.dart';
 import '../widgets/calculator_input.dart';
 
 class ConverterScreen extends StatefulWidget {
@@ -123,20 +124,34 @@ class _ConverterScreenState extends State<ConverterScreen> {
               // Unit selectors (now in separate rows)
               Column(
                 children: [
-                  UnitSelector(
-                    value: _fromUnit,
-                    units: _conversionService.getUnits(widget.converterType),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _fromUnit = value;
-                        });
-                        _convertLive(_sourceValue);
-                      }
-                    },
-                    label: '',
-                    isCurrency: widget.converterType == ConverterType.currency,
-                  ),
+                  widget.converterType == ConverterType.currency
+                      ? SearchableCurrencySelector(
+                          value: _fromUnit,
+                          currencies: _conversionService.getUnits(widget.converterType),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _fromUnit = value;
+                              });
+                              _convertLive(_sourceValue);
+                            }
+                          },
+                          label: '',
+                        )
+                      : UnitSelector(
+                          value: _fromUnit,
+                          units: _conversionService.getUnits(widget.converterType),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _fromUnit = value;
+                              });
+                              _convertLive(_sourceValue);
+                            }
+                          },
+                          label: '',
+                          isCurrency: false,
+                        ),
                   const SizedBox(height: 8),
                   Center(
                     child: IconButton(
@@ -148,20 +163,34 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  UnitSelector(
-                    value: _toUnit,
-                    units: _conversionService.getUnits(widget.converterType),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _toUnit = value;
-                        });
-                        _convertLive(_sourceValue);
-                      }
-                    },
-                    label: '',
-                    isCurrency: widget.converterType == ConverterType.currency,
-                  ),
+                  widget.converterType == ConverterType.currency
+                      ? SearchableCurrencySelector(
+                          value: _toUnit,
+                          currencies: _conversionService.getUnits(widget.converterType),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _toUnit = value;
+                              });
+                              _convertLive(_sourceValue);
+                            }
+                          },
+                          label: '',
+                        )
+                      : UnitSelector(
+                          value: _toUnit,
+                          units: _conversionService.getUnits(widget.converterType),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _toUnit = value;
+                              });
+                              _convertLive(_sourceValue);
+                            }
+                          },
+                          label: '',
+                          isCurrency: false,
+                        ),
                 ],
               ),
               const SizedBox(height: 24),
