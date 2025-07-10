@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/currency_preferences_service.dart';
 
 class SearchableCurrencySelector extends StatefulWidget {
@@ -6,6 +7,7 @@ class SearchableCurrencySelector extends StatefulWidget {
   final List<String> currencies;
   final Function(String?) onChanged;
   final String label;
+  final VoidCallback? onStarredChanged; // New callback for starred changes
 
   static const Map<String, String> _currencySymbols = {
     'USD': '\$',
@@ -55,6 +57,7 @@ class SearchableCurrencySelector extends StatefulWidget {
     required this.currencies,
     required this.onChanged,
     required this.label,
+    this.onStarredChanged, // Optional callback
   });
 
   @override
@@ -285,6 +288,9 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
                   });
                   _updateOverlay();
                   
+                  // Notify other instances about the starred change
+                  widget.onStarredChanged?.call();
+                  
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
@@ -332,56 +338,67 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
           _focusNode.unfocus();
         }
       },
-      child: CompositedTransformTarget(
-        link: _layerLink,
-        child: Container(
-          constraints: const BoxConstraints(minWidth: 120),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+      child: KeyboardListener(
+        focusNode: FocusNode(),
+        onKeyEvent: (KeyEvent event) {
+          if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+            if (_isOpen) {
+              _removeOverlay();
+              _focusNode.unfocus();
+            }
+          }
+        },
+        child: CompositedTransformTarget(
+          link: _layerLink,
+          child: Container(
+            constraints: const BoxConstraints(minWidth: 120),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              ),
+              borderRadius: BorderRadius.circular(12),
             ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: TextField(
-            controller: _searchController,
-            focusNode: _focusNode,
-            decoration: InputDecoration(
-              hintText: widget.value.isEmpty ? 'Search currencies...' : _getDisplayText(),
-              hintStyle: widget.value.isEmpty 
-                  ? null 
-                  : Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+            child: TextField(
+              controller: _searchController,
+              focusNode: _focusNode,
+              decoration: InputDecoration(
+                hintText: widget.value.isEmpty ? 'Search currencies...' : _getDisplayText(),
+                hintStyle: widget.value.isEmpty 
+                    ? null 
+                    : Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                suffixIcon: Icon(
+                  _isOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              suffixIcon: Icon(
-                _isOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              style: Theme.of(context).textTheme.titleMedium,
+              onChanged: _filterCurrencies,
+              onTap: () {
+                if (!_isOpen) {
+                  _showOverlay();
+                }
+              },
+              onSubmitted: (value) {
+                if (_filteredCurrencies.isNotEmpty) {
+                  widget.onChanged?.call(_filteredCurrencies.first);
+                  _searchController.clear();
+                  _filteredCurrencies = _getSortedCurrencies();
+                  _removeOverlay();
+                  _focusNode.unfocus();
+                }
+              },
             ),
-            style: Theme.of(context).textTheme.titleMedium,
-            onChanged: _filterCurrencies,
-            onTap: () {
-              if (!_isOpen) {
-                _showOverlay();
-              }
-            },
-            onSubmitted: (value) {
-              if (_filteredCurrencies.isNotEmpty) {
-                widget.onChanged?.call(_filteredCurrencies.first);
-                _searchController.clear();
-                _filteredCurrencies = _getSortedCurrencies();
-                _removeOverlay();
-                _focusNode.unfocus();
-              }
-            },
           ),
         ),
       ),

@@ -24,6 +24,10 @@ class _ConverterScreenState extends State<ConverterScreen> {
   String _result = '';
   String _sourceValue = '';
   bool _isLoading = false;
+  
+  // Key to force rebuild of currency selectors when starred currencies change
+  Key _fromSelectorKey = UniqueKey();
+  Key _toSelectorKey = UniqueKey();
 
   @override
   void initState() {
@@ -43,6 +47,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
         _fromUnit = units.first;
         _toUnit = units.length > 1 ? units[1] : units.first;
       }
+    }
+  }
+  
+  void _onStarredCurrencyChanged() {
+    // Force rebuild of both currency selectors to update starred status
+    if (mounted) {
+      setState(() {
+        _fromSelectorKey = UniqueKey();
+        _toSelectorKey = UniqueKey();
+      });
     }
   }
 
@@ -126,6 +140,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                 children: [
                   widget.converterType == ConverterType.currency
                       ? SearchableCurrencySelector(
+                          key: _fromSelectorKey,
                           value: _fromUnit,
                           currencies: _conversionService.getUnits(widget.converterType),
                           onChanged: (value) {
@@ -137,6 +152,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                             }
                           },
                           label: '',
+                          onStarredChanged: _onStarredCurrencyChanged,
                         )
                       : UnitSelector(
                           value: _fromUnit,
@@ -165,6 +181,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   const SizedBox(height: 8),
                   widget.converterType == ConverterType.currency
                       ? SearchableCurrencySelector(
+                          key: _toSelectorKey,
                           value: _toUnit,
                           currencies: _conversionService.getUnits(widget.converterType),
                           onChanged: (value) {
@@ -176,6 +193,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                             }
                           },
                           label: '',
+                          onStarredChanged: _onStarredCurrencyChanged,
                         )
                       : UnitSelector(
                           value: _toUnit,

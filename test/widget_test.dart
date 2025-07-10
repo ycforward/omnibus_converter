@@ -6,6 +6,7 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:converter_app/main.dart';
@@ -129,6 +130,225 @@ void main() {
         // If it throws, it should be a specific error, not a crash
         expect(e.toString(), isNotEmpty);
       }
+    });
+  });
+
+  group('UI Tests', () {
+    testWidgets('Currency converter screen should load without errors', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      
+      // Wait for initial build
+      await tester.pumpAndSettle();
+      
+      // Verify the screen loads
+      expect(find.text('Currency'), findsOneWidget);
+      expect(find.byType(SearchableCurrencySelector), findsNWidgets(2));
+    });
+    
+    testWidgets('ESC key should close currency dropdown', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Find the first currency selector and tap to open dropdown
+      final fromSelector = find.byType(SearchableCurrencySelector).first;
+      await tester.tap(fromSelector);
+      await tester.pumpAndSettle();
+      
+      // Verify dropdown is open by looking for a currency name in the overlay
+      expect(find.text('US Dollar'), findsOneWidget);
+      
+      // Press ESC key
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      
+      // Verify dropdown is closed (overlay should be gone)
+      expect(find.text('US Dollar'), findsNothing);
+    });
+    
+    testWidgets('Starring currency in one dropdown should update the other', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Open the first (from) currency selector
+      final fromSelector = find.byType(SearchableCurrencySelector).first;
+      await tester.tap(fromSelector);
+      await tester.pumpAndSettle();
+      
+      // Find and tap the star button for CAD (should not be starred initially)
+      final cadItem = find.text('CAD');
+      expect(cadItem, findsOneWidget);
+      
+      // Find the star toggle button for CAD by finding the InkWell that contains both CAD text and star_border icon
+      final cadContainer = find.ancestor(
+        of: cadItem,
+        matching: find.byType(Container),
+      ).first;
+      
+      final starToggleButton = find.descendant(
+        of: cadContainer,
+        matching: find.byIcon(Icons.star_border),
+      ).last; // Last one should be the toggle button
+      
+      await tester.tap(starToggleButton);
+      await tester.pumpAndSettle();
+      
+      // Close the first dropdown by tapping elsewhere
+      await tester.tapAt(const Offset(50, 50));
+      await tester.pumpAndSettle();
+      
+      // Open the second (to) currency selector
+      final toSelector = find.byType(SearchableCurrencySelector).last;
+      await tester.tap(toSelector);
+      await tester.pumpAndSettle();
+      
+      // Verify CAD now appears with a star in the second dropdown
+      final cadInSecondDropdown = find.text('CAD');
+      expect(cadInSecondDropdown, findsOneWidget);
+      
+      // Verify there's a filled star icon (meaning CAD is starred)
+      final cadContainerSecond = find.ancestor(
+        of: cadInSecondDropdown,
+        matching: find.byType(Container),
+      ).first;
+      
+      final starredIcon = find.descendant(
+        of: cadContainerSecond,
+        matching: find.byIcon(Icons.star),
+      ).first; // First one should be the status star
+      expect(starredIcon, findsOneWidget);
+    });
+    
+    testWidgets('Starred currencies should persist across widget rebuilds', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      
+      // Star a currency using the service directly
+      await CurrencyPreferencesService.toggleStarred('CHF');
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Open currency selector
+      final fromSelector = find.byType(SearchableCurrencySelector).first;
+      await tester.tap(fromSelector);
+      await tester.pumpAndSettle();
+      
+      // Verify CHF is starred (appears with star icon)
+      final chfItem = find.text('CHF');
+      expect(chfItem, findsOneWidget);
+      
+      final chfContainer = find.ancestor(
+        of: chfItem,
+        matching: find.byType(Container),
+      ).first;
+      
+      final starredIcon = find.descendant(
+        of: chfContainer,
+        matching: find.byIcon(Icons.star),
+      ).first;
+      expect(starredIcon, findsOneWidget);
+      
+      // Close dropdown
+      await tester.tapAt(const Offset(50, 50));
+      await tester.pumpAndSettle();
+      
+      // Rebuild the widget completely
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Open currency selector again
+      final newFromSelector = find.byType(SearchableCurrencySelector).first;
+      await tester.tap(newFromSelector);
+      await tester.pumpAndSettle();
+      
+      // Verify CHF is still starred
+      final chfItemAfterRebuild = find.text('CHF');
+      expect(chfItemAfterRebuild, findsOneWidget);
+      
+      final chfContainerAfterRebuild = find.ancestor(
+        of: chfItemAfterRebuild,
+        matching: find.byType(Container),
+      ).first;
+      
+      final starredIconAfterRebuild = find.descendant(
+        of: chfContainerAfterRebuild,
+        matching: find.byIcon(Icons.star),
+      ).first;
+      expect(starredIconAfterRebuild, findsOneWidget);
+    });
+    
+    testWidgets('Search functionality should work with starred currencies', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      
+      await tester.pumpAndSettle();
+      
+      // Open currency selector
+      final fromSelector = find.byType(SearchableCurrencySelector).first;
+      await tester.tap(fromSelector);
+      await tester.pumpAndSettle();
+      
+      // Find the search field and enter a search term
+      final searchField = find.byType(TextField).first;
+      await tester.enterText(searchField, 'CAD');
+      await tester.pumpAndSettle();
+      
+      // Verify CAD appears in search results
+      expect(find.text('CAD'), findsOneWidget);
+      expect(find.text('Canadian Dollar'), findsOneWidget);
+      
+      // Clear search by entering empty string
+      await tester.enterText(searchField, '');
+      await tester.pumpAndSettle();
+      
+      // Verify default starred currencies are shown first
+      expect(find.text('USD'), findsOneWidget);
+      expect(find.text('CNY'), findsOneWidget);
+      expect(find.text('EUR'), findsOneWidget);
     });
   });
 }
