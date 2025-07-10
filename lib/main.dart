@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/home_screen.dart';
+import 'services/exchange_rate_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,15 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  
+  // Preload exchange rates in background to reduce conversion latency
+  print('Starting exchange rate preload...');
+  ExchangeRateService.preloadExchangeRates().then((_) {
+    print('Exchange rate preload completed');
+  }).catchError((error) {
+    print('Exchange rate preload failed: $error');
+  });
+  
   runApp(const ConverterApp());
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:converter_app/services/exchange_rate_service.dart';
@@ -8,6 +9,12 @@ import 'package:converter_app/services/conversion_service.dart';
 class TestHelpers {
   /// Initialize test environment with mock values
   static Future<void> setupTestEnvironment() async {
+    // Initialize Flutter test binding first
+    TestWidgetsFlutterBinding.ensureInitialized();
+    
+    // Mock SharedPreferences to avoid plugin errors in tests
+    _setupSharedPreferencesMock();
+    
     // Initialize dotenv if not already initialized
     if (!dotenv.isInitialized) {
       try {
@@ -21,6 +28,44 @@ class TestHelpers {
     // Set up mock environment variables
     dotenv.env['UNIRATE_API_KEY'] = 'test_api_key';
     dotenv.env['UNIRATE_BASE_URL'] = 'https://api.unirateapi.com/api';
+    
+    // Clear any existing exchange rate cache
+    await ExchangeRateService.clearCache();
+  }
+
+  /// Set up SharedPreferences mock for testing
+  static void _setupSharedPreferencesMock() {
+    // Mock data storage
+    final Map<String, dynamic> mockPrefs = {};
+    
+    TestWidgetsFlutterBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('plugins.flutter.io/shared_preferences'),
+      (MethodCall methodCall) async {
+        switch (methodCall.method) {
+          case 'getAll':
+            return mockPrefs;
+          case 'setBool':
+          case 'setInt':
+          case 'setDouble':
+          case 'setString':
+          case 'setStringList':
+            final String key = methodCall.arguments['key'];
+            final dynamic value = methodCall.arguments['value'];
+            mockPrefs[key] = value;
+            return true;
+          case 'remove':
+            final String key = methodCall.arguments['key'];
+            mockPrefs.remove(key);
+            return true;
+          case 'clear':
+            mockPrefs.clear();
+            return true;
+          default:
+            return null;
+        }
+      },
+    );
   }
 
   /// Create a test app wrapper with proper theme and navigation

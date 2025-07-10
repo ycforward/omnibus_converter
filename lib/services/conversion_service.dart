@@ -3,9 +3,7 @@ import 'exchange_rate_service.dart';
 import 'currency_service.dart';
 
 class ConversionService {
-  // Exchange rates will be fetched from API
-  Map<String, double>? _exchangeRates;
-  bool _isLoadingRates = false;
+  // Exchange rates are now managed by ExchangeRateService with preloading and persistent caching
 
   List<String> getUnits(ConverterType type) {
     switch (type) {
@@ -64,37 +62,25 @@ class ConversionService {
   }
 
   List<String> _getCurrencyUnits() {
-    // Return a default list of currencies if rates haven't been loaded yet
-    if (_exchangeRates == null) {
-      return CurrencyService.getDefaultCurrencies();
+    // Get available currencies from ExchangeRateService
+    // This will be fast since rates are preloaded on app startup
+    if (ExchangeRateService.hasCachedRates) {
+      return ExchangeRateService.getCachedCurrencies();
     }
-    return _exchangeRates!.keys.toList();
-  }
-
-  Future<void> _ensureExchangeRatesLoaded() async {
-    if (_exchangeRates == null && !_isLoadingRates) {
-      _isLoadingRates = true;
-      try {
-        _exchangeRates = await ExchangeRateService.getExchangeRates();
-      } finally {
-        _isLoadingRates = false;
-      }
-    }
+    
+    // Fallback to default currencies if cache not available
+    return CurrencyService.getDefaultCurrencies();
   }
 
   Future<double> _convertCurrency(double value, String fromUnit, String toUnit) async {
-    await _ensureExchangeRatesLoaded();
+    // Use ExchangeRateService which now has preloaded rates and caching
+    final exchangeRate = await ExchangeRateService.getExchangeRate(fromUnit, toUnit);
     
-    final fromRate = _exchangeRates?[fromUnit];
-    final toRate = _exchangeRates?[toUnit];
-    
-    if (fromRate == null || toRate == null) {
-      throw Exception('Invalid currency unit: $fromUnit or $toUnit');
+    if (exchangeRate == null) {
+      throw Exception('Could not get exchange rate for $fromUnit to $toUnit');
     }
     
-    // Convert to USD first, then to target currency
-    final usdValue = value / fromRate;
-    return usdValue * toRate;
+    return value * exchangeRate;
   }
 
   double _convertLength(double value, String fromUnit, String toUnit) {
