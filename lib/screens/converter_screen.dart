@@ -135,6 +135,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       }
                     },
                     label: '',
+                    isCurrency: widget.converterType == ConverterType.currency,
                   ),
                   const SizedBox(height: 8),
                   Center(
@@ -159,6 +160,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       }
                     },
                     label: '',
+                    isCurrency: widget.converterType == ConverterType.currency,
                   ),
                 ],
               ),

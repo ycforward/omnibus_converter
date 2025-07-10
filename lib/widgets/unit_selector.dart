@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../services/currency_preferences_service.dart';
 
-class UnitSelector extends StatelessWidget {
+class UnitSelector extends StatefulWidget {
   final String value;
   final List<String> units;
   final Function(String?) onChanged;
   final String label;
+  final bool isCurrency; // New parameter to determine if this is for currencies
 
   static const Map<String, String> _currencySymbols = {
     'USD': '\$',
@@ -97,7 +99,85 @@ class UnitSelector extends StatelessWidget {
     required this.units,
     required this.onChanged,
     required this.label,
+    this.isCurrency = false, // Default to false for backward compatibility
   });
+
+  @override
+  State<UnitSelector> createState() => _UnitSelectorState();
+}
+
+class _UnitSelectorState extends State<UnitSelector> {
+  
+  Widget _buildCurrencyDropdownItem(String unit) {
+    final isStarred = CurrencyPreferencesService.isStarred(unit);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      child: Row(
+        children: [
+          // Star icon for starred currencies
+          Icon(
+            isStarred ? Icons.star : Icons.star_border,
+            size: 16,
+            color: isStarred 
+                ? Colors.amber 
+                : Theme.of(context).colorScheme.outline.withOpacity(0.5),
+          ),
+          const SizedBox(width: 8),
+          // Currency display text
+          Expanded(
+            child: Text(
+              widget._getUnitDisplay(unit),
+              style: TextStyle(
+                fontWeight: widget.value == unit ? FontWeight.bold : FontWeight.normal,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          // Star toggle button (only show on long press or tap)
+          if (widget.isCurrency)
+            InkWell(
+              onTap: () async {
+                final newStarredStatus = await CurrencyPreferencesService.toggleStarred(unit);
+                setState(() {}); // Refresh to show updated star status
+                
+                // Show a brief snackbar to confirm the action
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        newStarredStatus 
+                            ? 'Added $unit to favorites' 
+                            : 'Removed $unit from favorites',
+                      ),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Icon(
+                  Icons.star_border,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.7),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRegularDropdownItem(String unit) {
+    return Text(
+      widget._getUnitDisplay(unit),
+      style: TextStyle(
+        fontWeight: widget.value == unit ? FontWeight.bold : FontWeight.normal,
+      ),
+      overflow: TextOverflow.ellipsis,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,20 +190,16 @@ class UnitSelector extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: DropdownButtonFormField<String>(
-        value: value.isNotEmpty ? value : null,
-        items: units.map((unit) {
+        value: widget.value.isNotEmpty ? widget.value : null,
+        items: widget.units.map((unit) {
           return DropdownMenuItem<String>(
             value: unit,
-            child: Text(
-              _getUnitDisplay(unit),
-              style: TextStyle(
-                fontWeight: value == unit ? FontWeight.bold : FontWeight.normal,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: widget.isCurrency 
+                ? _buildCurrencyDropdownItem(unit)
+                : _buildRegularDropdownItem(unit),
           );
         }).toList(),
-        onChanged: onChanged,
+        onChanged: widget.onChanged,
         decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -142,6 +218,7 @@ class UnitSelector extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
         dropdownColor: Theme.of(context).colorScheme.surface,
+        menuMaxHeight: 400, // Increased height to accommodate star functionality
       ),
     );
   }

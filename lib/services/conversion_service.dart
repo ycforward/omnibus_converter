@@ -1,6 +1,7 @@
 import '../models/converter_type.dart';
 import 'exchange_rate_service.dart';
 import 'currency_service.dart';
+import 'currency_preferences_service.dart';
 
 class ConversionService {
   // Exchange rates are now managed by ExchangeRateService with preloading and persistent caching
@@ -64,12 +65,17 @@ class ConversionService {
   List<String> _getCurrencyUnits() {
     // Get available currencies from ExchangeRateService
     // This will be fast since rates are preloaded on app startup
+    List<String> currencies;
+    
     if (ExchangeRateService.hasCachedRates) {
-      return ExchangeRateService.getCachedCurrencies();
+      currencies = ExchangeRateService.getCachedCurrencies();
+    } else {
+      // Fallback to default currencies if cache not available
+      currencies = CurrencyService.getDefaultCurrencies();
     }
     
-    // Fallback to default currencies if cache not available
-    return CurrencyService.getDefaultCurrencies();
+    // Sort currencies with starred ones first
+    return CurrencyPreferencesService.sortCurrenciesWithStarredFirst(currencies);
   }
 
   Future<double> _convertCurrency(double value, String fromUnit, String toUnit) async {

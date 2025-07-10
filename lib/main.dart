@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/home_screen.dart';
 import 'services/exchange_rate_service.dart';
+import 'services/currency_preferences_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +37,14 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
   
-  // Preload exchange rates in background to reduce conversion latency
+  // Initialize currency preferences and preload exchange rates in background
+  print('Initializing currency preferences...');
+  CurrencyPreferencesService.initialize().then((_) {
+    print('Currency preferences initialized');
+  }).catchError((error) {
+    print('Currency preferences initialization failed: $error');
+  });
+  
   print('Starting exchange rate preload...');
   ExchangeRateService.preloadExchangeRates().then((_) {
     print('Exchange rate preload completed');

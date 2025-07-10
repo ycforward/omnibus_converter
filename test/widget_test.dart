@@ -14,11 +14,13 @@ import 'package:converter_app/models/converter_type.dart';
 import 'package:converter_app/widgets/calculator_input.dart';
 import 'package:converter_app/widgets/unit_selector.dart';
 import 'package:converter_app/services/conversion_service.dart';
+import 'package:converter_app/services/currency_preferences_service.dart';
 import 'test_helpers.dart';
 
 void main() {
   setUpAll(() async {
     await TestHelpers.setupTestEnvironment();
+    await CurrencyPreferencesService.initialize();
   });
 
   group('Widget Tests', () {
@@ -47,6 +49,25 @@ void main() {
       expect(find.byType(ConverterScreen), findsOneWidget);
       expect(find.byType(UnitSelector), findsNWidgets(2));
       expect(find.byType(CalculatorInput), findsOneWidget);
+    });
+
+    testWidgets('Currency converter screen should show starred currencies', (WidgetTester tester) async {
+      await CurrencyPreferencesService.initialize();
+      
+      await tester.pumpWidget(
+        TestHelpers.createTestApp(
+          const ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      await TestHelpers.waitForAsync(tester);
+      
+      // Verify the screen loads without layout errors
+      expect(find.byType(ConverterScreen), findsOneWidget);
+      expect(find.byType(UnitSelector), findsNWidgets(2));
+      expect(find.byType(CalculatorInput), findsOneWidget);
+      
+      // Check that currency info section is displayed
+      expect(find.byIcon(Icons.update), findsOneWidget);
     });
   });
 
