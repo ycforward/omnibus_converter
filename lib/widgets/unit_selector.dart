@@ -83,9 +83,15 @@ class UnitSelector extends StatefulWidget {
     'Kilowatt Hour': 'kWh',
   };
 
-  String _getUnitDisplay(String unit) {
+  String _getUnitDisplay(String unit, {bool isDropdownItem = false}) {
     if (_currencySymbols.containsKey(unit)) {
-      return '${_currencySymbols[unit]} $unit';
+      if (isDropdownItem) {
+        // For dropdown items, show symbol and code on separate lines or more compact format
+        return unit; // Just show the currency code for now to fit
+      } else {
+        // For selected display, show symbol + code
+        return '${_currencySymbols[unit]} $unit';
+      }
     }
     if (_unitAbbreviations.containsKey(unit)) {
       return '${_unitAbbreviations[unit]} ($unit)';
@@ -110,6 +116,7 @@ class _UnitSelectorState extends State<UnitSelector> {
   
   Widget _buildCurrencyDropdownItem(String unit) {
     final isStarred = CurrencyPreferencesService.isStarred(unit);
+    final symbol = UnitSelector._currencySymbols[unit] ?? '';
     
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -124,14 +131,30 @@ class _UnitSelectorState extends State<UnitSelector> {
                 : Theme.of(context).colorScheme.outline.withOpacity(0.5),
           ),
           const SizedBox(width: 8),
-          // Currency display text
+          // Currency display with symbol and code
           Expanded(
-            child: Text(
-              widget._getUnitDisplay(unit),
-              style: TextStyle(
-                fontWeight: widget.value == unit ? FontWeight.bold : FontWeight.normal,
-              ),
-              overflow: TextOverflow.ellipsis,
+            child: Row(
+              children: [
+                if (symbol.isNotEmpty) ...[
+                  Text(
+                    symbol,
+                    style: TextStyle(
+                      fontWeight: widget.value == unit ? FontWeight.bold : FontWeight.normal,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                ],
+                Flexible(
+                  child: Text(
+                    unit,
+                    style: TextStyle(
+                      fontWeight: widget.value == unit ? FontWeight.bold : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ),
           // Star toggle button (only show on long press or tap)
@@ -171,7 +194,7 @@ class _UnitSelectorState extends State<UnitSelector> {
 
   Widget _buildRegularDropdownItem(String unit) {
     return Text(
-      widget._getUnitDisplay(unit),
+      widget._getUnitDisplay(unit, isDropdownItem: true),
       style: TextStyle(
         fontWeight: widget.value == unit ? FontWeight.bold : FontWeight.normal,
       ),
@@ -200,6 +223,47 @@ class _UnitSelectorState extends State<UnitSelector> {
           );
         }).toList(),
         onChanged: widget.onChanged,
+        selectedItemBuilder: (BuildContext context) {
+          return widget.units.map<Widget>((String unit) {
+            if (widget.isCurrency) {
+              final symbol = UnitSelector._currencySymbols[unit] ?? '';
+              return Container(
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    if (symbol.isNotEmpty) ...[
+                      Text(
+                        symbol,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    Flexible(
+                      child: Text(
+                        unit,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget._getUnitDisplay(unit),
+                  style: Theme.of(context).textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }
+          }).toList();
+        },
         decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -207,7 +271,7 @@ class _UnitSelectorState extends State<UnitSelector> {
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: 0,
+            vertical: 12,
           ),
         ),
         style: Theme.of(context).textTheme.titleMedium,
