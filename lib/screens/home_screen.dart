@@ -1,4 +1,5 @@
 import 'converter_screen.dart';
+import 'favorites_screen.dart';
 import '../models/converter_type.dart';
 import 'package:flutter/material.dart';
 
@@ -7,37 +8,67 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sortedTypes = List<ConverterType>.from(ConverterType.values)
-      ..sort((a, b) => a.title.compareTo(b.title));
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Unit Converter'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 24),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.95,
-                ),
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: sortedTypes.length,
-                itemBuilder: (context, index) {
-                  final converterType = sortedTypes[index];
-                  return _ConverterCard(converterType: converterType);
-                },
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Unit Converter'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          bottom: const TabBar(
+            tabs: [
+              Tab(
+                icon: Icon(Icons.calculate),
+                text: 'Converters',
               ),
-            ),
+              Tab(
+                icon: Icon(Icons.favorite),
+                text: 'Favorites',
+              ),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            _ConvertersTab(),
+            FavoritesScreen(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ConvertersTab extends StatelessWidget {
+  const _ConvertersTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final sortedTypes = List<ConverterType>.from(ConverterType.values)
+      ..sort((a, b) => a.title.compareTo(b.title));
+    
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 24),
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.95,
+              ),
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: sortedTypes.length,
+              itemBuilder: (context, index) {
+                final converterType = sortedTypes[index];
+                return _ConverterCard(converterType: converterType);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -3,7 +3,8 @@ import '../models/converter_type.dart';
 import '../services/conversion_service.dart';
 import '../services/exchange_rate_service.dart';
 import '../services/session_memory_service.dart';
-import '../widgets/conversion_input.dart';
+import '../services/favorites_service.dart';
+
 import '../widgets/unit_selector.dart';
 import '../widgets/searchable_currency_selector.dart';
 import '../widgets/calculator_input.dart';
@@ -19,12 +20,14 @@ class ConverterScreen extends StatefulWidget {
 
 class _ConverterScreenState extends State<ConverterScreen> {
   final ConversionService _conversionService = ConversionService();
+  final FavoritesService _favoritesService = FavoritesService.instance;
   
   String _fromUnit = '';
   String _toUnit = '';
   String _result = '';
   String _sourceValue = '';
   bool _isLoading = false;
+  bool _isFavorite = false;
   
   // Key to force rebuild of currency selectors when starred currencies change
   Key _fromSelectorKey = UniqueKey();
@@ -41,6 +44,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       if (_sourceValue.isNotEmpty) {
         _convertLive(_sourceValue);
       }
+      _checkFavoriteStatus();
     });
   }
 
@@ -84,6 +88,44 @@ class _ConverterScreenState extends State<ConverterScreen> {
       _sourceValue = SessionMemoryService.getLastSourceValue();
     } else {
       _sourceValue = '';
+    }
+  }
+
+  Future<void> _checkFavoriteStatus() async {
+    if (_fromUnit.isNotEmpty && _toUnit.isNotEmpty) {
+      final isFavorite = await _favoritesService.isFavorite(
+        widget.converterType,
+        _fromUnit,
+        _toUnit,
+      );
+      setState(() {
+        _isFavorite = isFavorite;
+      });
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    if (_fromUnit.isEmpty || _toUnit.isEmpty) return;
+
+    final success = await _favoritesService.toggleFavorite(
+      widget.converterType,
+      _fromUnit,
+      _toUnit,
+    );
+
+    if (success) {
+      setState(() {
+        _isFavorite = !_isFavorite;
+      });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isFavorite ? 'Added to favorites' : 'Removed from favorites'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
   
@@ -173,6 +215,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
     }
     
     _convertLive(_sourceValue);
+    _checkFavoriteStatus();
   }
 
   void _onFromUnitChanged(String? value) {
@@ -187,6 +230,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       }
       
       _convertLive(_sourceValue);
+      _checkFavoriteStatus();
     }
   }
 
@@ -202,6 +246,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       }
       
       _convertLive(_sourceValue);
+      _checkFavoriteStatus();
     }
   }
 
@@ -298,6 +343,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
       appBar: AppBar(
         title: Text(widget.converterType.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            onPressed: _toggleFavorite,
+            icon: Icon(
+              _isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: _isFavorite ? Colors.red : null,
+            ),
+            tooltip: _isFavorite ? 'Remove from favorites' : 'Add to favorites',
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -326,6 +381,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                 _fromUnit = value;
                               });
                               _convertLive(_sourceValue);
+                              _checkFavoriteStatus();
                             }
                           },
                           label: '',
@@ -360,6 +416,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                 _toUnit = value;
                               });
                               _convertLive(_sourceValue);
+                              _checkFavoriteStatus();
                             }
                           },
                           label: '',
