@@ -35,6 +35,13 @@ class _ConverterScreenState extends State<ConverterScreen> {
     super.initState();
     _initializeUnits();
     _initializeSourceValue();
+    
+    // Perform initial conversion if we have a source value
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_sourceValue.isNotEmpty) {
+        _convertLive(_sourceValue);
+      }
+    });
   }
 
   void _initializeUnits() {
@@ -104,12 +111,14 @@ class _ConverterScreenState extends State<ConverterScreen> {
   }
 
   void _convertLive(String value) {
+    // Handle empty value
     if (value.isEmpty) {
       setState(() {
         _result = '';
       });
       return;
     }
+    
     final input = double.tryParse(value);
     if (input == null) {
       setState(() {
@@ -117,6 +126,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
       });
       return;
     }
+    
+    // Always perform conversion, even for 0 (e.g., 0°C = 32°F)
     setState(() {
       _isLoading = true;
     });
@@ -424,7 +435,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : Text(
-                                  _result.isEmpty ? '-' : _result,
+                                  _result.isEmpty ? '0' : _result,
                                   style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                                 ),
                         ],
