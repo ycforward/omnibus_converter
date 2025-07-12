@@ -15,6 +15,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   final FavoritesService _favoritesService = FavoritesService.instance;
   List<FavoriteConversion> _favorites = [];
   bool _isLoading = true;
+  bool _isEditMode = false;
 
   @override
   void initState() {
@@ -174,10 +175,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   '${_favorites.length} favorite${_favorites.length == 1 ? '' : 's'}',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                TextButton.icon(
-                  onPressed: _clearAllFavorites,
-                  icon: const Icon(Icons.clear_all),
-                  label: const Text('Clear All'),
+                Row(
+                  children: [
+                    if (_isEditMode)
+                      TextButton.icon(
+                        onPressed: _clearAllFavorites,
+                        icon: const Icon(Icons.clear_all),
+                        label: const Text('Clear All'),
+                      ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isEditMode = !_isEditMode;
+                        });
+                      },
+                      child: Text(_isEditMode ? 'Done' : 'Edit'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -201,15 +216,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
-                        onPressed: () => _removeFavorite(favorite),
-                        icon: const Icon(Icons.delete_outline),
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                      const Icon(Icons.chevron_right),
+                      if (_isEditMode)
+                        IconButton(
+                          onPressed: () => _removeFavorite(favorite),
+                          icon: const Icon(Icons.delete_outline),
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      if (!_isEditMode)
+                        const Icon(Icons.chevron_right),
                     ],
                   ),
-                  onTap: () => _navigateToConverter(favorite),
+                  onTap: _isEditMode ? null : () => _navigateToConverter(favorite),
                 ),
               );
             },
