@@ -198,10 +198,87 @@ class _ConverterScreenState extends State<ConverterScreen> {
     if (widget.converterType == ConverterType.currency) {
       final symbol = SearchableCurrencySelector.getCurrencySymbol(unit);
       if (symbol.isNotEmpty) {
-        return '$symbol $unit';
+        return symbol; // Just the symbol, not "$ USD"
       }
     }
-    return unit;
+    return _getUnitAbbreviation(unit);
+  }
+
+  String _getUnitAbbreviation(String unit) {
+    // Use abbreviations for all unit types
+    switch (unit) {
+      // Length units
+      case 'Meter': return 'm';
+      case 'Kilometer': return 'km';
+      case 'Centimeter': return 'cm';
+      case 'Millimeter': return 'mm';
+      case 'Mile': return 'mi';
+      case 'Yard': return 'yd';
+      case 'Foot': return 'ft';
+      case 'Inch': return 'in';
+      
+      // Weight units
+      case 'Kilogram': return 'kg';
+      case 'Gram': return 'g';
+      case 'Pound': return 'lb';
+      case 'Ounce': return 'oz';
+      case 'Ton': return 't';
+      case 'Stone': return 'st';
+      
+      // Temperature units
+      case 'Celsius': return '°C';
+      case 'Fahrenheit': return '°F';
+      case 'Kelvin': return 'K';
+      
+      // Volume units
+      case 'Liter': return 'L';
+      case 'Milliliter': return 'mL';
+      case 'Gallon': return 'gal';
+      case 'Quart': return 'qt';
+      case 'Pint': return 'pt';
+      case 'Cup': return 'cup';
+      case 'Fluid Ounce': return 'fl oz';
+      
+      // Area units
+      case 'Square Meter': return 'm²';
+      case 'Square Kilometer': return 'km²';
+      case 'Square Mile': return 'mi²';
+      case 'Acre': return 'ac';
+      case 'Square Yard': return 'yd²';
+      case 'Square Foot': return 'ft²';
+      
+      // Speed units
+      case 'Miles per Hour': return 'mph';
+      case 'Kilometers per Hour': return 'km/h';
+      case 'Meters per Second': return 'm/s';
+      case 'Knots': return 'kn';
+      case 'Feet per Second': return 'ft/s';
+      
+      // Cooking units
+      case 'Tablespoon': return 'tbsp';
+      case 'Teaspoon': return 'tsp';
+      
+      // Angle units
+      case 'Degree': return '°';
+      case 'Radian': return 'rad';
+      case 'Gradian': return 'grad';
+      
+      // Density units
+      case 'Kilogram per Cubic Meter': return 'kg/m³';
+      case 'Gram per Cubic Centimeter': return 'g/cm³';
+      case 'Pound per Cubic Foot': return 'lb/ft³';
+      
+      // Energy units
+      case 'Joule': return 'J';
+      case 'Kilojoule': return 'kJ';
+      case 'Calorie': return 'cal';
+      case 'Kilocalorie': return 'kcal';
+      case 'Watt Hour': return 'Wh';
+      case 'Kilowatt Hour': return 'kWh';
+      
+      // Default: return the unit as-is if no abbreviation found
+      default: return unit;
+    }
   }
 
   @override
