@@ -312,50 +312,63 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
     Size size = renderBox.size;
 
     return OverlayEntry(
-      builder: (context) => Positioned(
-        width: size.width,
-        child: CompositedTransformFollower(
-          link: _layerLink,
-          showWhenUnlinked: false,
-          offset: Offset(0.0, size.height + 5.0),
-          child: Material(
-            elevation: 8.0,
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              constraints: const BoxConstraints(maxHeight: 300),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
+      builder: (context) => Stack(
+        children: [
+          // Invisible barrier to catch outside taps
+          ModalBarrier(
+            color: Colors.transparent,
+            onDismiss: () {
+              _removeOverlay();
+              _focusNode.unfocus();
+            },
+          ),
+          // The actual dropdown
+          Positioned(
+            width: size.width,
+            child: CompositedTransformFollower(
+              link: _layerLink,
+              showWhenUnlinked: false,
+              offset: Offset(0.0, size.height + 5.0),
+              child: Material(
+                elevation: 8.0,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                child: Container(
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                    ),
+                  ),
+                  child: _filteredCurrencies.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            'No currencies found',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero, // Remove default padding to eliminate whitespace
+                            shrinkWrap: true,
+                            physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling
+                            itemCount: _filteredCurrencies.length,
+                            itemBuilder: (context, index) {
+                              final currency = _filteredCurrencies[index];
+                              return _buildCurrencyListItem(currency);
+                            },
+                          ),
+                        ),
                 ),
               ),
-              child: _filteredCurrencies.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        'No currencies found',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero, // Remove default padding to eliminate whitespace
-                        shrinkWrap: true,
-                        physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling
-                        itemCount: _filteredCurrencies.length,
-                        itemBuilder: (context, index) {
-                          final currency = _filteredCurrencies[index];
-                          return _buildCurrencyListItem(currency);
-                        },
-                      ),
-                    ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -472,75 +485,66 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Dismiss overlay when tapping outside
-        if (_isOpen) {
-          _removeOverlay();
-          _focusNode.unfocus();
+    return KeyboardListener(
+      focusNode: FocusNode(),
+      onKeyEvent: (KeyEvent event) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+          if (_isOpen) {
+            _removeOverlay();
+            _focusNode.unfocus();
+          }
         }
       },
-      child: KeyboardListener(
-        focusNode: FocusNode(),
-        onKeyEvent: (KeyEvent event) {
-          if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-            if (_isOpen) {
-              _removeOverlay();
-              _focusNode.unfocus();
-            }
-          }
-        },
-        child: CompositedTransformTarget(
-          link: _layerLink,
-          child: Container(
-            constraints: const BoxConstraints(minWidth: 120),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-              ),
-              borderRadius: BorderRadius.circular(12),
+      child: CompositedTransformTarget(
+        link: _layerLink,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 120),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
             ),
-            child: TextField(
-              controller: _searchController,
-              focusNode: _focusNode,
-              decoration: InputDecoration(
-                hintText: widget.value.isEmpty ? 'Search currencies...' : _getDisplayText(),
-                hintStyle: widget.value.isEmpty 
-                    ? null 
-                    : Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                suffixIcon: Icon(
-                  _isOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: TextField(
+            controller: _searchController,
+            focusNode: _focusNode,
+            decoration: InputDecoration(
+              hintText: widget.value.isEmpty ? 'Search currencies...' : _getDisplayText(),
+              hintStyle: widget.value.isEmpty 
+                  ? null 
+                  : Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
-              style: Theme.of(context).textTheme.titleMedium,
-              onChanged: _filterCurrencies,
-              onTap: () {
-                if (!_isOpen) {
-                  _showOverlay();
-                }
-              },
-              onSubmitted: (value) {
-                if (_filteredCurrencies.isNotEmpty) {
-                  widget.onChanged?.call(_filteredCurrencies.first);
-                  _searchController.clear();
-                  _filteredCurrencies = _getSortedCurrencies();
-                  _removeOverlay();
-                  _focusNode.unfocus();
-                }
-              },
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              suffixIcon: Icon(
+                _isOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
+            style: Theme.of(context).textTheme.titleMedium,
+            onChanged: _filterCurrencies,
+            onTap: () {
+              if (!_isOpen) {
+                _showOverlay();
+              }
+            },
+            onSubmitted: (value) {
+              if (_filteredCurrencies.isNotEmpty) {
+                widget.onChanged?.call(_filteredCurrencies.first);
+                _searchController.clear();
+                _filteredCurrencies = _getSortedCurrencies();
+                _removeOverlay();
+                _focusNode.unfocus();
+              }
+            },
           ),
         ),
       ),

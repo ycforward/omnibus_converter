@@ -501,4 +501,52 @@ void main() {
       expect(listView.padding, EdgeInsets.zero);
     });
   });
+
+  testWidgets('dropdown behavior works correctly', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              SearchableCurrencySelector(
+                value: 'USD',
+                currencies: const ['USD', 'EUR', 'GBP'],
+                onChanged: (value) {},
+                label: 'Test',
+              ),
+              const SizedBox(height: 100),
+              const Text('Outside area'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Test 1: Dropdown opens when tapping the field
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    
+    expect(find.text('EUR'), findsOneWidget);
+    expect(find.text('GBP'), findsOneWidget);
+
+    // Test 2: Dropdown closes when tapping outside
+    await tester.tapAt(const Offset(50, 400));
+    await tester.pumpAndSettle();
+    
+    expect(find.text('EUR'), findsNothing);
+    expect(find.text('GBP'), findsNothing);
+
+    // Test 3: Dropdown closes when selecting a currency
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    
+    expect(find.text('EUR'), findsOneWidget);
+    expect(find.text('GBP'), findsOneWidget);
+    
+    await tester.tap(find.text('EUR'));
+    await tester.pumpAndSettle();
+    
+    expect(find.text('EUR'), findsNothing);
+    expect(find.text('GBP'), findsNothing);
+  });
 }
