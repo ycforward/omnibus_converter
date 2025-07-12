@@ -41,7 +41,7 @@ void main() {
     });
 
     testWidgets('Length converter screen should load without overflow', (WidgetTester tester) async {
-      await tester.pumpWidget(
+    await tester.pumpWidget(
         TestHelpers.createTestApp(
           const ConverterScreen(converterType: ConverterType.length),
         ),
@@ -49,15 +49,15 @@ void main() {
       await TestHelpers.waitForAsync(tester);
       
       // Verify the screen loads without layout errors
-      expect(find.byType(ConverterScreen), findsOneWidget);
+    expect(find.byType(ConverterScreen), findsOneWidget);
       expect(find.byType(UnitSelector), findsNWidgets(2));
       expect(find.byType(CalculatorInput), findsOneWidget);
-    });
+  });
 
     testWidgets('Currency converter screen should load without errors', (WidgetTester tester) async {
       await CurrencyPreferencesService.initialize();
       
-      await tester.pumpWidget(
+    await tester.pumpWidget(
         TestHelpers.createTestApp(
           const ConverterScreen(converterType: ConverterType.currency),
         ),
@@ -81,7 +81,7 @@ void main() {
     });
 
     test('weight conversions', () async {
-      final service = ConversionService();
+    final service = ConversionService();
       expect(await service.convert(ConverterType.weight, 1, 'Kilogram', 'Gram'), closeTo(1000, 0.01));
       expect(await service.convert(ConverterType.weight, 1, 'Pound', 'Kilogram'), closeTo(0.453592, 0.01));
     });
