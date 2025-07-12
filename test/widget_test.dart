@@ -64,7 +64,7 @@ void main() {
     testWidgets('Currency converter screen should load without errors', (WidgetTester tester) async {
       // Set up with proper screen size
       tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+    tester.binding.window.devicePixelRatioTestValue = 1.0;
       
       await CurrencyPreferencesService.initialize();
       
@@ -194,7 +194,7 @@ void main() {
         ),
       );
       
-      await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
       
       final fromSelector = find.byType(SearchableCurrencySelector).first;
       await tester.tap(fromSelector);
@@ -203,7 +203,7 @@ void main() {
       expect(find.text('US Dollar'), findsOneWidget);
       
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
       
       expect(find.text('US Dollar'), findsNothing);
       
@@ -223,12 +223,12 @@ void main() {
       
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
+      home: Scaffold(
             body: SafeArea(
               child: ConverterScreen(converterType: ConverterType.currency),
-            ),
-          ),
-        ),
+                  ),
+                ),
+              ),
       );
       
       await tester.pumpAndSettle();
@@ -332,9 +332,9 @@ void main() {
           home: Scaffold(
             body: SafeArea(
               child: ConverterScreen(converterType: ConverterType.currency),
-            ),
           ),
         ),
+      ),
       );
       
       await tester.pumpAndSettle();
@@ -361,8 +361,8 @@ void main() {
       // Reset window size
       tester.binding.window.clearPhysicalSizeTestValue();
       tester.binding.window.clearDevicePixelRatioTestValue();
-    });
-    
+  });
+
     testWidgets('Search functionality should work with starred currencies', (WidgetTester tester) async {
       // Set up with proper screen size
       tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
@@ -373,11 +373,11 @@ void main() {
       
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
+      home: Scaffold(
             body: SafeArea(
               child: ConverterScreen(converterType: ConverterType.currency),
-            ),
-          ),
+        ),
+      ),
         ),
       );
       
@@ -406,7 +406,7 @@ void main() {
       // Reset window size
       tester.binding.window.clearPhysicalSizeTestValue();
       tester.binding.window.clearDevicePixelRatioTestValue();
-    });
+  });
   });
 
   group('Session Memory Tests', () {
@@ -416,17 +416,17 @@ void main() {
       await TestHelpers.setupTestEnvironment();
       await CurrencyPreferencesService.initialize();
       SessionMemoryService.clearSession();
-      await tester.pumpWidget(
-        MaterialApp(
+    await tester.pumpWidget(
+      MaterialApp(
           home: Navigator(
             onGenerateRoute: (settings) {
               return MaterialPageRoute(
                 builder: (context) => Scaffold(
                   body: SafeArea(
                     child: ConverterScreen(converterType: ConverterType.currency),
-                  ),
-                ),
-              );
+        ),
+      ),
+    );
             },
           ),
         ),
@@ -439,26 +439,26 @@ void main() {
       await tester.tap(eurItems.last);
       await tester.pumpAndSettle();
       // Simulate navigation by pushing a new route
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Navigator(
-            onGenerateRoute: (settings) {
-              return MaterialPageRoute(
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Navigator(
+          onGenerateRoute: (settings) {
+            return MaterialPageRoute(
                 builder: (context) => Scaffold(
                   body: SafeArea(
                     child: ConverterScreen(converterType: ConverterType.currency),
                   ),
                 ),
-              );
-            },
-          ),
+            );
+          },
         ),
-      );
+      ),
+    );
       await tester.pumpAndSettle();
       expect(SessionMemoryService.getLastFromCurrency(), 'EUR');
       tester.binding.window.clearPhysicalSizeTestValue();
       tester.binding.window.clearDevicePixelRatioTestValue();
-    });
+  });
 
     testWidgets('Currency converter should start with value "1" by default', (WidgetTester tester) async {
       tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
@@ -468,11 +468,11 @@ void main() {
       SessionMemoryService.clearSession();
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
+      home: Scaffold(
             body: SafeArea(
               child: ConverterScreen(converterType: ConverterType.currency),
             ),
-          ),
+            ),
         ),
       );
       await tester.pumpAndSettle();
@@ -562,7 +562,7 @@ void main() {
       tester.binding.window.clearPhysicalSizeTestValue();
       tester.binding.window.clearDevicePixelRatioTestValue();
     });
-  });
+    });
 
   testWidgets('dropdown behavior works correctly', (WidgetTester tester) async {
     await tester.pumpWidget(

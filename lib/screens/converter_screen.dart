@@ -288,7 +288,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'From',
+                            'From (${_fromUnit})',
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
                           const SizedBox(height: 4),
@@ -315,7 +315,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'To',
+                            'To (${_toUnit})',
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
                           const SizedBox(height: 4),

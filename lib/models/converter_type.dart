@@ -38,7 +38,7 @@ enum ConverterType {
   ),
   cooking(
     title: 'Cooking',
-    description: 'Convert between cooking units (tbsp, cups, gallons, etc.)',
+    description: 'Convert between cooking units',
     icon: Icons.restaurant_menu,
   ),
   angle(
