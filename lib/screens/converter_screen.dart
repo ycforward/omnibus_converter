@@ -28,6 +28,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
   String _sourceValue = '';
   bool _isLoading = false;
   bool _isFavorite = false;
+  bool _isRefreshing = false;
   
   // Key to force rebuild of currency selectors when starred currencies change
   Key _fromSelectorKey = UniqueKey();
@@ -87,7 +88,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
       // Use remembered source value or default to "1"
       _sourceValue = SessionMemoryService.getLastSourceValue();
     } else {
-      _sourceValue = '';
+      // All other converter types should also start with "1"
+      _sourceValue = '1';
     }
   }
 
@@ -98,9 +100,11 @@ class _ConverterScreenState extends State<ConverterScreen> {
         _fromUnit,
         _toUnit,
       );
-      setState(() {
-        _isFavorite = isFavorite;
-      });
+      if (mounted) {
+        setState(() {
+          _isFavorite = isFavorite;
+        });
+      }
     }
   }
 
@@ -126,6 +130,49 @@ class _ConverterScreenState extends State<ConverterScreen> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _refreshExchangeRates() async {
+    if (_isRefreshing) return;
+    
+    setState(() {
+      _isRefreshing = true;
+    });
+
+    try {
+      // Clear the cache to force fresh data
+      await ExchangeRateService.clearCache();
+      
+      // Fetch fresh rates
+      await ExchangeRateService.getExchangeRates();
+      
+      // Perform conversion again with fresh rates
+      if (_sourceValue.isNotEmpty) {
+        _convertLive(_sourceValue);
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Exchange rates refreshed'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error refreshing rates: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        _isRefreshing = false;
+      });
     }
   }
   
@@ -541,6 +588,21 @@ class _ConverterScreenState extends State<ConverterScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      _isRefreshing
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : IconButton(
+                              onPressed: _refreshExchangeRates,
+                              icon: const Icon(Icons.refresh),
+                              iconSize: 20,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                              tooltip: 'Refresh exchange rates',
+                            ),
                     ],
                   ),
                 ),
