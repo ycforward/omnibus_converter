@@ -211,16 +211,21 @@ class SearchableCurrencySelector extends StatefulWidget {
 class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final LayerLink _layerLink = LayerLink();
+  final List<String> _filteredCurrencies = [];
+  OverlayEntry? _overlayEntry;
   bool _isOpen = false;
   bool _isDisposing = false;
-  List<String> _filteredCurrencies = [];
-  OverlayEntry? _overlayEntry;
-  final LayerLink _layerLink = LayerLink();
+  
+  // Cache theme data to avoid accessing context after disposal
+  late ThemeData _theme;
+  late ColorScheme _colorScheme;
+  late TextTheme _textTheme;
 
   @override
   void initState() {
     super.initState();
-    _filteredCurrencies = _getSortedCurrencies();
+    _filteredCurrencies.addAll(_getSortedCurrencies());
     
     // Listen for focus changes to close overlay
     _focusNode.addListener(() {
@@ -228,6 +233,15 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
         _removeOverlay();
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Cache theme data when dependencies change
+    _theme = Theme.of(context);
+    _colorScheme = _theme.colorScheme;
+    _textTheme = _theme.textTheme;
   }
 
   @override
@@ -249,27 +263,31 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
     if (_isDisposing) return;
     setState(() {
       if (query.isEmpty) {
-        _filteredCurrencies = _getSortedCurrencies();
+        _filteredCurrencies.clear();
+        _filteredCurrencies.addAll(_getSortedCurrencies());
       } else {
         final lowerQuery = query.toLowerCase();
-        _filteredCurrencies = widget.currencies.where((currency) {
+        _filteredCurrencies.clear();
+        _filteredCurrencies.addAll(widget.currencies.where((currency) {
           final currencyLower = currency.toLowerCase();
           final currencyName = SearchableCurrencySelector._currencyNames[currency]?.toLowerCase() ?? '';
           return currencyLower.contains(lowerQuery) || currencyName.contains(lowerQuery);
-        }).toList();
+        }).toList());
 
         // Sort filtered results with starred first, then by relevance
         _filteredCurrencies.sort((a, b) {
-          final aIsStarred = CurrencyPreferencesService.isStarred(a);
-          final bIsStarred = CurrencyPreferencesService.isStarred(b);
+          final aStarred = CurrencyPreferencesService.isStarred(a);
+          final bStarred = CurrencyPreferencesService.isStarred(b);
           
-          if (aIsStarred && !bIsStarred) return -1;
-          if (!aIsStarred && bIsStarred) return 1;
+          if (aStarred && !bStarred) return -1;
+          if (!aStarred && bStarred) return 1;
           
-          // Then by how early the match appears
-          final aIndex = a.toLowerCase().indexOf(lowerQuery);
-          final bIndex = b.toLowerCase().indexOf(lowerQuery);
-          if (aIndex != bIndex) return aIndex.compareTo(bIndex);
+          // If both have same starred status, sort by relevance (exact match first)
+          final aExact = a.toLowerCase() == lowerQuery;
+          final bExact = b.toLowerCase() == lowerQuery;
+          
+          if (aExact && !bExact) return -1;
+          if (!aExact && bExact) return 1;
           
           return a.compareTo(b);
         });
@@ -339,10 +357,10 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
                       child: Container(
                         constraints: const BoxConstraints(maxHeight: 300),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
+                          color: _colorScheme.surface,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                            color: _colorScheme.outline.withOpacity(0.2),
                           ),
                         ),
                         child: ClipRRect(
@@ -378,7 +396,8 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
       onTap: () {
         widget.onChanged?.call(currency);
         _searchController.clear();
-        _filteredCurrencies = _getSortedCurrencies();
+        _filteredCurrencies.clear();
+        _filteredCurrencies.addAll(_getSortedCurrencies());
         _removeOverlay();
         _focusNode.unfocus();
       },
@@ -386,7 +405,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected 
-              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+              ? _colorScheme.primaryContainer.withOpacity(0.3)
               : null,
         ),
         child: Row(
@@ -401,7 +420,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
                       if (symbol.isNotEmpty) ...[
                         Text(
                           symbol,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: _textTheme.titleMedium?.copyWith(
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                           ),
                         ),
@@ -409,7 +428,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
                       ],
                       Text(
                         currency,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        style: _textTheme.titleMedium?.copyWith(
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                         ),
                       ),
@@ -418,8 +437,8 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
                   if (name.isNotEmpty)
                     Text(
                       name,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      style: _textTheme.bodySmall?.copyWith(
+                        color: _colorScheme.onSurfaceVariant,
                       ),
                     ),
                 ],
@@ -432,7 +451,8 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
                 final newStarredStatus = await CurrencyPreferencesService.toggleStarred(currency);
                 if (mounted && !_isDisposing) {
                   setState(() {
-                    _filteredCurrencies = _getSortedCurrencies();
+                    _filteredCurrencies.clear();
+                    _filteredCurrencies.addAll(_getSortedCurrencies());
                   });
                   _updateOverlay();
                   
@@ -458,7 +478,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
                   size: 18,
                   color: isStarred 
                       ? Colors.amber 
-                      : Theme.of(context).colorScheme.outline.withOpacity(0.7),
+                      : _colorScheme.outline.withOpacity(0.7),
                 ),
               ),
             ),
@@ -496,7 +516,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
           constraints: const BoxConstraints(minWidth: 120),
           decoration: BoxDecoration(
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              color: _colorScheme.outline.withOpacity(0.3),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -507,8 +527,8 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
               hintText: widget.value.isEmpty ? 'Search currencies...' : _getDisplayText(),
               hintStyle: widget.value.isEmpty 
                   ? null 
-                  : Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
+                  : _textTheme.titleMedium?.copyWith(
+                      color: _colorScheme.onSurface,
                     ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -521,10 +541,10 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
               ),
               suffixIcon: Icon(
                 _isOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                color: Theme.of(context).colorScheme.primary,
+                color: _colorScheme.primary,
               ),
             ),
-            style: Theme.of(context).textTheme.titleMedium,
+            style: _textTheme.titleMedium,
             onChanged: _filterCurrencies,
             onTap: () {
               if (!_isOpen) {
@@ -535,7 +555,8 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
               if (_filteredCurrencies.isNotEmpty) {
                 widget.onChanged?.call(_filteredCurrencies.first);
                 _searchController.clear();
-                _filteredCurrencies = _getSortedCurrencies();
+                _filteredCurrencies.clear();
+                _filteredCurrencies.addAll(_getSortedCurrencies());
                 _removeOverlay();
                 _focusNode.unfocus();
               }
