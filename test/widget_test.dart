@@ -19,6 +19,7 @@ import 'package:converter_app/services/conversion_service.dart';
 import 'package:converter_app/services/currency_preferences_service.dart';
 import 'test_helpers.dart';
 import 'package:converter_app/services/exchange_rate_service.dart';
+import 'package:converter_app/services/session_memory_service.dart';
 
 void main() {
   setUpAll(() async {
@@ -363,6 +364,141 @@ void main() {
       expect(find.text('USD').evaluate().length, greaterThanOrEqualTo(1));
       expect(find.text('CNY').evaluate().length, greaterThanOrEqualTo(1));
       expect(find.text('EUR').evaluate().length, greaterThanOrEqualTo(1));
+    });
+  });
+
+  group('Session Memory Tests', () {
+    testWidgets('Currency converter should remember last used currencies within session', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      SessionMemoryService.clearSession();
+      
+      // First visit - should use defaults
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      await tester.pumpAndSettle();
+      
+      // Change currencies
+      final fromSelector = find.byType(SearchableCurrencySelector).first;
+      await tester.tap(fromSelector);
+      await tester.pumpAndSettle();
+      
+      // Find and select EUR
+      final eurItems = find.text('EUR');
+      await tester.tap(eurItems.last);
+      await tester.pumpAndSettle();
+      
+      // Go back to home and return to currency converter
+      Navigator.of(tester.element(find.byType(ConverterScreen))).pop();
+      await tester.pumpAndSettle();
+      
+      // Navigate back to currency converter
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      await tester.pumpAndSettle();
+      
+      // Should remember EUR as the from currency
+      expect(SessionMemoryService.getLastFromCurrency(), 'EUR');
+    });
+    
+    testWidgets('Currency converter should start with value "1" by default', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      SessionMemoryService.clearSession();
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      await tester.pumpAndSettle();
+      
+      // Check that the default source value is "1"
+      expect(SessionMemoryService.getLastSourceValue(), '1');
+      
+      // Verify the calculator shows "1"
+      expect(find.text('1'), findsOneWidget);
+    });
+    
+    testWidgets('Dropdown should be scrollable', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      await tester.pumpAndSettle();
+      
+      // Open currency selector
+      final fromSelector = find.byType(SearchableCurrencySelector).first;
+      await tester.tap(fromSelector);
+      await tester.pumpAndSettle();
+      
+      // Find the ListView in the dropdown
+      final listView = find.byType(ListView);
+      expect(listView, findsOneWidget);
+      
+      // Try to scroll the dropdown
+      await tester.drag(listView, const Offset(0, -100));
+      await tester.pumpAndSettle();
+      
+      // The test passes if no exception is thrown during scrolling
+      expect(listView, findsOneWidget);
+    });
+    
+    testWidgets('Session memory should persist source value changes', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      SessionMemoryService.clearSession();
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      await tester.pumpAndSettle();
+      
+      // Find and tap a calculator button to change the value
+      final button5 = find.text('5');
+      await tester.tap(button5);
+      await tester.pumpAndSettle();
+      
+      // Check that the source value is remembered
+      expect(SessionMemoryService.getLastSourceValue(), '15'); // 1 + 5 = 15
+    });
+    
+    testWidgets('Dropdown should have no padding at top', (WidgetTester tester) async {
+      // Set up
+      await TestHelpers.setupTestEnvironment();
+      await CurrencyPreferencesService.initialize();
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ConverterScreen(converterType: ConverterType.currency),
+        ),
+      );
+      await tester.pumpAndSettle();
+      
+      // Open currency selector
+      final fromSelector = find.byType(SearchableCurrencySelector).first;
+      await tester.tap(fromSelector);
+      await tester.pumpAndSettle();
+      
+      // Find the ListView and check it has zero padding
+      final listView = tester.widget<ListView>(find.byType(ListView));
+      expect(listView.padding, EdgeInsets.zero);
     });
   });
 }

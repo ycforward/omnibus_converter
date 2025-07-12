@@ -7,7 +7,7 @@ class SearchableCurrencySelector extends StatefulWidget {
   final List<String> currencies;
   final Function(String?) onChanged;
   final String label;
-  final VoidCallback? onStarredChanged; // Optional callback
+  final VoidCallback? onStarredChanged; // New callback for starred changes
 
   static const Map<String, String> _currencySymbols = {
     'USD': '\$',
@@ -233,6 +233,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
   @override
   void dispose() {
     _isDisposing = true;
+    // Remove overlay first before disposing other resources
     _overlayEntry?.remove();
     _overlayEntry = null;
     _searchController.dispose();
@@ -292,6 +293,7 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
   void _removeOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
+    // Only setState if the widget is still mounted and not being disposed
     if (mounted && !_isDisposing) {
       setState(() {
         _isOpen = false;
@@ -338,13 +340,18 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
                         ),
                       ),
                     )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _filteredCurrencies.length,
-                      itemBuilder: (context, index) {
-                        final currency = _filteredCurrencies[index];
-                        return _buildCurrencyListItem(currency);
-                      },
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero, // Remove default padding to eliminate whitespace
+                        shrinkWrap: true,
+                        physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling
+                        itemCount: _filteredCurrencies.length,
+                        itemBuilder: (context, index) {
+                          final currency = _filteredCurrencies[index];
+                          return _buildCurrencyListItem(currency);
+                        },
+                      ),
                     ),
             ),
           ),
@@ -376,15 +383,6 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
         ),
         child: Row(
           children: [
-            // Star icon
-            Icon(
-              isStarred ? Icons.star : Icons.star_border,
-              size: 16,
-              color: isStarred 
-                  ? Colors.amber 
-                  : Theme.of(context).colorScheme.outline.withOpacity(0.5),
-            ),
-            const SizedBox(width: 12),
             // Currency info
             Expanded(
               child: Column(
@@ -482,16 +480,15 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
           _focusNode.unfocus();
         }
       },
-      child: Focus(
-        onKeyEvent: (FocusNode node, KeyEvent event) {
+      child: KeyboardListener(
+        focusNode: FocusNode(),
+        onKeyEvent: (KeyEvent event) {
           if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
             if (_isOpen) {
               _removeOverlay();
               _focusNode.unfocus();
-              return KeyEventResult.handled;
             }
           }
-          return KeyEventResult.ignored;
         },
         child: CompositedTransformTarget(
           link: _layerLink,

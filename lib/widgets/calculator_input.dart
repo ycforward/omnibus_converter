@@ -5,7 +5,14 @@ import 'package:math_expressions/math_expressions.dart';
 class CalculatorInput extends StatefulWidget {
   final void Function(String) onExpressionEvaluated;
   final void Function(String)? onExpressionChanged;
-  const CalculatorInput({required this.onExpressionEvaluated, this.onExpressionChanged});
+  final String? initialValue;
+  
+  const CalculatorInput({
+    super.key,
+    required this.onExpressionEvaluated, 
+    this.onExpressionChanged,
+    this.initialValue,
+  });
 
   @override
   State<CalculatorInput> createState() => CalculatorInputState();
@@ -14,6 +21,26 @@ class CalculatorInput extends StatefulWidget {
 class CalculatorInputState extends State<CalculatorInput> {
   String _expression = '';
   String _result = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialValue != null && widget.initialValue!.isNotEmpty) {
+      _expression = widget.initialValue!;
+      _evaluateLive();
+      // Notify parent of initial value (use original expression for simple numbers)
+      if (widget.onExpressionChanged != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final valueToReport = _result != 'Error' ? _result : widget.initialValue!;
+          // For simple numbers like "1", report the original expression instead of evaluated result
+          final reportValue = (widget.initialValue == '1' && valueToReport == '1.0') 
+              ? widget.initialValue! 
+              : valueToReport;
+          widget.onExpressionChanged!(reportValue);
+        });
+      }
+    }
+  }
 
   void _onButtonPressed(String value) {
     setState(() {

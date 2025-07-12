@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/converter_type.dart';
 import '../services/conversion_service.dart';
 import '../services/exchange_rate_service.dart';
+import '../services/session_memory_service.dart';
 import '../widgets/conversion_input.dart';
 import '../widgets/unit_selector.dart';
 import '../widgets/searchable_currency_selector.dart';
@@ -33,20 +34,49 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void initState() {
     super.initState();
     _initializeUnits();
+    _initializeSourceValue();
   }
 
   void _initializeUnits() {
     final units = _conversionService.getUnits(widget.converterType);
     if (units.isNotEmpty) {
       if (widget.converterType == ConverterType.currency) {
-        // Set default currency conversion to USD → CNY
-        _fromUnit = units.contains('USD') ? 'USD' : units.first;
-        _toUnit = units.contains('CNY') ? 'CNY' : (units.length > 1 ? units[1] : units.first);
+        // Use session memory if available, otherwise use defaults
+        if (SessionMemoryService.hasRememberedCurrencies()) {
+          final lastFrom = SessionMemoryService.getLastFromCurrency();
+          final lastTo = SessionMemoryService.getLastToCurrency();
+          
+          // Verify the remembered currencies are still available
+          if (lastFrom != null && lastTo != null && 
+              units.contains(lastFrom) && units.contains(lastTo)) {
+            _fromUnit = lastFrom;
+            _toUnit = lastTo;
+          } else {
+            _setDefaultCurrencies(units);
+          }
+        } else {
+          _setDefaultCurrencies(units);
+        }
       } else {
         // For other conversions, use first two units
         _fromUnit = units.first;
         _toUnit = units.length > 1 ? units[1] : units.first;
       }
+    }
+  }
+
+  void _setDefaultCurrencies(List<String> units) {
+    // Set default currency conversion to USD → CNY
+    _fromUnit = units.contains('USD') ? 'USD' : units.first;
+    _toUnit = units.contains('CNY') ? 'CNY' : (units.length > 1 ? units[1] : units.first);
+  }
+
+  void _initializeSourceValue() {
+    if (widget.converterType == ConverterType.currency) {
+      // Use remembered source value or default to "1"
+      _sourceValue = SessionMemoryService.getLastSourceValue();
+    } else {
+      _sourceValue = '';
     }
   }
   
@@ -64,6 +94,12 @@ class _ConverterScreenState extends State<ConverterScreen> {
     setState(() {
       _sourceValue = value;
     });
+    
+    // Remember the source value for currency conversions
+    if (widget.converterType == ConverterType.currency) {
+      SessionMemoryService.rememberSourceValue(value);
+    }
+    
     _convertLive(value);
   }
 
@@ -119,7 +155,43 @@ class _ConverterScreenState extends State<ConverterScreen> {
       _fromUnit = _toUnit;
       _toUnit = temp;
     });
+    
+    // Remember the new currency pair for currency conversions
+    if (widget.converterType == ConverterType.currency) {
+      SessionMemoryService.rememberCurrencyPair(_fromUnit, _toUnit);
+    }
+    
     _convertLive(_sourceValue);
+  }
+
+  void _onFromUnitChanged(String? value) {
+    if (value != null) {
+      setState(() {
+        _fromUnit = value;
+      });
+      
+      // Remember the new currency pair for currency conversions
+      if (widget.converterType == ConverterType.currency) {
+        SessionMemoryService.rememberCurrencyPair(_fromUnit, _toUnit);
+      }
+      
+      _convertLive(_sourceValue);
+    }
+  }
+
+  void _onToUnitChanged(String? value) {
+    if (value != null) {
+      setState(() {
+        _toUnit = value;
+      });
+      
+      // Remember the new currency pair for currency conversions
+      if (widget.converterType == ConverterType.currency) {
+        SessionMemoryService.rememberCurrencyPair(_fromUnit, _toUnit);
+      }
+      
+      _convertLive(_sourceValue);
+    }
   }
 
   @override
@@ -143,14 +215,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                           key: _fromSelectorKey,
                           value: _fromUnit,
                           currencies: _conversionService.getUnits(widget.converterType),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _fromUnit = value;
-                              });
-                              _convertLive(_sourceValue);
-                            }
-                          },
+                          onChanged: _onFromUnitChanged,
                           label: '',
                           onStarredChanged: _onStarredCurrencyChanged,
                         )
@@ -184,14 +249,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                           key: _toSelectorKey,
                           value: _toUnit,
                           currencies: _conversionService.getUnits(widget.converterType),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _toUnit = value;
-                              });
-                              _convertLive(_sourceValue);
-                            }
-                          },
+                          onChanged: _onToUnitChanged,
                           label: '',
                           onStarredChanged: _onStarredCurrencyChanged,
                         )
@@ -280,6 +338,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
               // Calculator section fills all remaining space, no extra box above
               Expanded(
                 child: CalculatorInput(
+                  initialValue: _sourceValue,
                   onExpressionEvaluated: (value) {
                     _onCalculatorChanged(value);
                   },
