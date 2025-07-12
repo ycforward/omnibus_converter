@@ -194,6 +194,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
     }
   }
 
+  String _getUnitDisplayText(String unit) {
+    if (widget.converterType == ConverterType.currency) {
+      final symbol = SearchableCurrencySelector.getCurrencySymbol(unit);
+      if (symbol.isNotEmpty) {
+        return '$symbol $unit';
+      }
+    }
+    return unit;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -288,7 +298,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _fromUnit,
+                            _getUnitDisplayText(_fromUnit),
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
                           const SizedBox(height: 4),
@@ -297,6 +307,17 @@ class _ConverterScreenState extends State<ConverterScreen> {
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                  // Equals sign between the boxes
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: Text(
+                      '=',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -315,7 +336,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _toUnit,
+                            _getUnitDisplayText(_toUnit),
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
                           const SizedBox(height: 4),
