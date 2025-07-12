@@ -548,65 +548,73 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   ),
                 ],
               ),
-              // Calculator section fills all remaining space, no extra box above
+              // Calculator section fills remaining space, accounting for info section
               Expanded(
-                child: CalculatorInput(
-                  initialValue: _sourceValue,
-                  onExpressionEvaluated: (value) {
-                    _onCalculatorChanged(value);
-                  },
-                  onExpressionChanged: (value) {
-                    _onCalculatorChanged(value);
-                  },
-                ),
-              ),
-              
-              // Info section for currency
-              if (widget.converterType == ConverterType.currency) ...[
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.update,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.primary,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: CalculatorInput(
+                        initialValue: _sourceValue,
+                        onExpressionEvaluated: (value) {
+                          _onCalculatorChanged(value);
+                        },
+                        onExpressionChanged: (value) {
+                          _onCalculatorChanged(value);
+                        },
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          ExchangeRateService.getLastFetchTimeFormatted() ??
-                              'No exchange rates available. Please check your internet connection.',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                    ),
+                    
+                    // Compact info section for currency
+                    if (widget.converterType == ConverterType.currency) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.update,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                ExchangeRateService.getLastFetchTimeFormatted() ??
+                                    'No exchange rates available',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontSize: 11,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            _isRefreshing
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(strokeWidth: 1.5),
+                                  )
+                                : IconButton(
+                                    onPressed: _refreshExchangeRates,
+                                    icon: const Icon(Icons.refresh),
+                                    iconSize: 16,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                                    tooltip: 'Refresh exchange rates',
+                                  ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      _isRefreshing
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : IconButton(
-                              onPressed: _refreshExchangeRates,
-                              icon: const Icon(Icons.refresh),
-                              iconSize: 20,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                              tooltip: 'Refresh exchange rates',
-                            ),
                     ],
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ],
           ),
         ),
