@@ -312,63 +312,58 @@ class _SearchableCurrencySelectorState extends State<SearchableCurrencySelector>
     Size size = renderBox.size;
 
     return OverlayEntry(
-      builder: (context) => Stack(
-        children: [
-          // Invisible barrier to catch outside taps
-          ModalBarrier(
-            color: Colors.transparent,
-            onDismiss: () {
-              _removeOverlay();
-              _focusNode.unfocus();
-            },
-          ),
-          // The actual dropdown
-          Positioned(
-            width: size.width,
-            child: CompositedTransformFollower(
-              link: _layerLink,
-              showWhenUnlinked: false,
-              offset: Offset(0.0, size.height + 5.0),
-              child: Material(
-                elevation: 8.0,
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  constraints: const BoxConstraints(maxHeight: 300),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                    ),
-                  ),
-                  child: _filteredCurrencies.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            'No currencies found',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+      builder: (context) => GestureDetector(
+        onTap: () {
+          _removeOverlay();
+          _focusNode.unfocus();
+        },
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Colors.transparent,
+          child: Stack(
+            children: [
+              Positioned(
+                width: size.width,
+                child: CompositedTransformFollower(
+                  link: _layerLink,
+                  showWhenUnlinked: false,
+                  offset: Offset(0.0, size.height + 5.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      // Prevent taps on the dropdown from closing it
+                    },
+                    child: Material(
+                      elevation: 8.0,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        constraints: const BoxConstraints(maxHeight: 300),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
                           ),
-                        )
-                      : ClipRRect(
+                        ),
+                        child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: ListView.builder(
-                            padding: EdgeInsets.zero, // Remove default padding to eliminate whitespace
-                            shrinkWrap: true,
-                            physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling
+                            padding: EdgeInsets.zero,
+                            physics: const AlwaysScrollableScrollPhysics(),
                             itemCount: _filteredCurrencies.length,
                             itemBuilder: (context, index) {
-                              final currency = _filteredCurrencies[index];
-                              return _buildCurrencyListItem(currency);
+                              return _buildCurrencyListItem(_filteredCurrencies[index]);
                             },
                           ),
                         ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
