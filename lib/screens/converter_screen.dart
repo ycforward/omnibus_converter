@@ -703,20 +703,29 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   ),
                                 ),
                               ] else ...[
-                                // For other units: value first, then abbreviation
-                                Expanded(
-                                  child: Text(
-                                    _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
-                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                // For other units: value first, then abbreviation (positioned next to value)
+                                Flexible(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Theme.of(context).colorScheme.onSurface,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: ' ' + _getUnitDisplayText(_fromUnit),
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
-                                  ),
-                                ),
-                                Text(
-                                  ' ' + _getUnitDisplayText(_fromUnit),
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ],
@@ -816,20 +825,29 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                         ),
                                       ),
                                     ] else ...[
-                                      // For other units: value first, then abbreviation
-                                      Expanded(
-                                        child: Text(
-                                          _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                      // For other units: value first, then abbreviation (positioned next to value)
+                                      Flexible(
+                                        child: RichText(
+                                          text: TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
+                                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: ' ' + _getUnitDisplayText(_toUnit),
+                                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
-                                        ),
-                                      ),
-                                      Text(
-                                        ' ' + _getUnitDisplayText(_toUnit),
-                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                          fontWeight: FontWeight.normal,
                                         ),
                                       ),
                                     ],
