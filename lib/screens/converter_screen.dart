@@ -297,16 +297,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
     }
   }
 
-  String _getUnitDisplayText(String unit) {
-    if (widget.converterType == ConverterType.currency) {
-      final symbol = SearchableCurrencySelector.getCurrencySymbol(unit);
-      if (symbol.isNotEmpty) {
-        return symbol; // Just the symbol, not "$ USD"
-      }
-    }
-    return _getUnitAbbreviation(unit);
-  }
-
   String _formatResult(double result) {
     if (widget.converterType == ConverterType.currency) {
       // Always show three decimal places for currency
@@ -364,8 +354,32 @@ class _ConverterScreenState extends State<ConverterScreen> {
     return value;
   }
 
+  String _formatDisplayValueForLargeNumbers(String value) {
+    if (value.isEmpty || value == '0') return '0';
+    
+    final double? number = double.tryParse(value);
+    if (number == null) return value;
+    
+    // For very large numbers, use formatted display with thousand separators
+    // instead of scientific notation to avoid display issues
+    if (number.abs() >= 1000) {
+      final parts = value.split('.');
+      final intPart = parts[0];
+      final decPart = parts.length > 1 ? '.${parts[1]}' : '';
+      
+      // Add commas every 3 digits
+      final formatted = intPart.replaceAllMapped(
+        RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+        (match) => '${match[1]},',
+      );
+      
+      return formatted + decPart;
+    }
+    
+    return value;
+  }
+
   String _getUnitAbbreviation(String unit) {
-    // Use abbreviations for all unit types
     switch (unit) {
       // Length units
       case 'Meter': return 'm';
@@ -464,163 +478,122 @@ class _ConverterScreenState extends State<ConverterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Unit selectors (now in separate rows)
-              Column(
-                children: [
-                  widget.converterType == ConverterType.currency
-                      ? SearchableCurrencySelector(
-                          key: _fromSelectorKey,
-                          value: _fromUnit,
-                          currencies: _conversionService.getUnits(widget.converterType),
-                          onChanged: _onFromUnitChanged,
-                          label: '',
-                          onStarredChanged: _onStarredCurrencyChanged,
-                        )
-                      : UnitSelector(
-                          value: _fromUnit,
-                          units: _conversionService.getUnits(widget.converterType),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _fromUnit = value;
-                              });
-                              _convertLive(_sourceValue);
-                              _checkFavoriteStatus();
-                            }
-                          },
-                          label: '',
-                          isCurrency: false,
-                        ),
-                  const SizedBox(height: 8),
-                  Center(
-                    child: IconButton(
-                      onPressed: _swapUnits,
-                      icon: const Icon(Icons.swap_horiz),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  widget.converterType == ConverterType.currency
-                      ? SearchableCurrencySelector(
-                          key: _toSelectorKey,
-                          value: _toUnit,
-                          currencies: _conversionService.getUnits(widget.converterType),
-                          onChanged: _onToUnitChanged,
-                          label: '',
-                          onStarredChanged: _onStarredCurrencyChanged,
-                        )
-                      : UnitSelector(
-                          value: _toUnit,
-                          units: _conversionService.getUnits(widget.converterType),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _toUnit = value;
-                              });
-                              _convertLive(_sourceValue);
-                              _checkFavoriteStatus();
-                            }
-                          },
-                          label: '',
-                          isCurrency: false,
-                        ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              // Source and target value boxes side by side
+              // Source unit selector row
               Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      height: 80, // Fixed height for consistent layout
-                      margin: const EdgeInsets.only(bottom: 16, right: 8),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            _getUnitDisplayText(_fromUnit),
-                            style: Theme.of(context).textTheme.labelMedium,
+                    child: widget.converterType == ConverterType.currency
+                        ? SearchableCurrencySelector(
+                            key: _fromSelectorKey,
+                            value: _fromUnit,
+                            currencies: _conversionService.getUnits(widget.converterType),
+                            onChanged: _onFromUnitChanged,
+                            label: 'From',
+                            onStarredChanged: _onStarredCurrencyChanged,
+                          )
+                        : UnitSelector(
+                            value: _fromUnit,
+                            units: _conversionService.getUnits(widget.converterType),
+                            onChanged: _onFromUnitChanged,
+                            label: 'From',
                           ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                _formatDisplayValue(_sourceValue.isEmpty ? '0' : _sourceValue),
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
-                  // Equals sign between the boxes
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: Text(
-                      '=',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              
+              // Source value box
+              Container(
+                height: 80,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
                   ),
-                  Expanded(
-                    child: Container(
-                      height: 80, // Fixed height for consistent layout
-                      margin: const EdgeInsets.only(bottom: 16, left: 8),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            _getUnitDisplayText(_toUnit),
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: _isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : Text(
-                                      _formatDisplayValue(_result.isEmpty ? '0' : _result),
-                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Swap button row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: _swapUnits,
+                    icon: const Icon(Icons.swap_vert),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                      padding: const EdgeInsets.all(12),
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              
+              // Target unit selector row
+              Row(
+                children: [
+                  Expanded(
+                    child: widget.converterType == ConverterType.currency
+                        ? SearchableCurrencySelector(
+                            key: _toSelectorKey,
+                            value: _toUnit,
+                            currencies: _conversionService.getUnits(widget.converterType),
+                            onChanged: _onToUnitChanged,
+                            label: 'To',
+                            onStarredChanged: _onStarredCurrencyChanged,
+                          )
+                        : UnitSelector(
+                            value: _toUnit,
+                            units: _conversionService.getUnits(widget.converterType),
+                            onChanged: _onToUnitChanged,
+                            label: 'To',
+                          ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              
+              // Target value box
+              Container(
+                height: 80,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  ),
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
               // Calculator section fills remaining space, accounting for info section
               Expanded(
                 child: Column(
