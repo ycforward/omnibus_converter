@@ -308,11 +308,14 @@ class _ConverterScreenState extends State<ConverterScreen> {
   }
 
   String _formatResult(double result) {
+    if (widget.converterType == ConverterType.currency) {
+      // Always show three decimal places for currency
+      return result.toStringAsFixed(3);
+    }
     // Handle very large numbers with scientific notation
     if (result.abs() >= 1e12) {
       return result.toStringAsExponential(2);
     }
-    
     // For normal numbers, use appropriate decimal places
     if (result.abs() >= 1000) {
       // Large numbers: use fewer decimal places

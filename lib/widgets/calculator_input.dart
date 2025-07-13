@@ -21,6 +21,7 @@ class CalculatorInput extends StatefulWidget {
 class CalculatorInputState extends State<CalculatorInput> {
   String _expression = '';
   String _result = '';
+  // Remove _hasUserInput
 
   @override
   void initState() {
@@ -28,11 +29,9 @@ class CalculatorInputState extends State<CalculatorInput> {
     if (widget.initialValue != null && widget.initialValue!.isNotEmpty) {
       _expression = widget.initialValue!;
       _evaluateLive();
-      // Notify parent of initial value (use original expression for simple numbers)
       if (widget.onExpressionChanged != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final valueToReport = _result != 'Error' ? _result : widget.initialValue!;
-          // For simple numbers like "1", report the original expression instead of evaluated result
           final reportValue = (widget.initialValue == '1' && valueToReport == '1.0') 
               ? widget.initialValue! 
               : valueToReport;
@@ -81,6 +80,7 @@ class CalculatorInputState extends State<CalculatorInput> {
           }
         }
       } else {
+        // Always append digits to the current expression
         _expression += value;
       }
       _evaluateLive();
@@ -96,8 +96,25 @@ class CalculatorInputState extends State<CalculatorInput> {
         _result = '';
         return;
       }
+      // If the expression contains a decimal point, evaluate as double
+      if (_expression.contains('.')) {
+        String expr = _expression;
+        if (expr.endsWith('+') || expr.endsWith('-')) {
+          expr += '0';
+        } else if (expr.endsWith('×') || expr.endsWith('*') || expr.endsWith('÷') || expr.endsWith('/')) {
+          expr += '1';
+        }
+        final exp = Parser().parse(expr.replaceAll('×', '*').replaceAll('÷', '/'));
+        final eval = exp.evaluate(EvaluationType.REAL, ContextModel());
+        _result = eval.toString();
+        return;
+      }
+      // If the expression is a valid integer string, keep it as is
+      if (RegExp(r'^-?\d+ ?$').hasMatch(_expression)) {
+        _result = _expression;
+        return;
+      }
       String expr = _expression;
-      // Handle incomplete expressions
       if (expr.endsWith('+') || expr.endsWith('-')) {
         expr += '0';
       } else if (expr.endsWith('×') || expr.endsWith('*') || expr.endsWith('÷') || expr.endsWith('/')) {
@@ -105,7 +122,12 @@ class CalculatorInputState extends State<CalculatorInput> {
       }
       final exp = Parser().parse(expr.replaceAll('×', '*').replaceAll('÷', '/'));
       final eval = exp.evaluate(EvaluationType.REAL, ContextModel());
-      _result = eval.toString();
+      // Display integers without trailing .0
+      if (eval is double && eval == eval.roundToDouble()) {
+        _result = eval.toInt().toString();
+      } else {
+        _result = eval.toString();
+      }
     } catch (e) {
       _result = 'Error';
     }
