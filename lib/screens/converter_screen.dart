@@ -204,27 +204,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
   }
 
   void _convertLive(String value) {
-    // Handle empty value
-    if (value.isEmpty) {
-      setState(() {
-        _result = '';
-      });
-      return;
-    }
-    
-    final input = double.tryParse(value);
+    final input = double.tryParse(value.isEmpty ? '0' : value);
     if (input == null) {
       setState(() {
         _result = '';
       });
       return;
     }
-    
-    // Always perform conversion, even for 0 (e.g., 0°C = 32°F)
     setState(() {
       _isLoading = true;
     });
-    
     _performConversion(input);
   }
 
@@ -660,18 +649,32 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.13), // slightly more contrast
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12),
                           ),
-                        ),
-                        child: Text(
-                          _getUnitFullName(_fromUnit),
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w600,
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                            width: 1.2,
                           ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _getUnitFullName(_fromUnit),
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.black38,
+                              size: 28,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -776,18 +779,32 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.13), // slightly more contrast
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12),
                           ),
-                        ),
-                        child: Text(
-                          _getUnitFullName(_toUnit),
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontWeight: FontWeight.w600,
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.secondary.withOpacity(0.25),
+                            width: 1.2,
                           ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _getUnitFullName(_toUnit),
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.secondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.black38,
+                              size: 28,
+                            ),
+                          ],
                         ),
                       ),
                     ),
