@@ -4,6 +4,7 @@ import '../services/conversion_service.dart';
 import '../services/exchange_rate_service.dart';
 import '../services/session_memory_service.dart';
 import '../services/favorites_service.dart';
+import '../services/currency_preferences_service.dart';
 
 import '../widgets/unit_selector.dart';
 import '../widgets/searchable_currency_selector.dart';
@@ -154,9 +155,10 @@ class _ConverterScreenState extends State<ConverterScreen> {
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Exchange rates refreshed'),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.green,
           ),
         );
       }
@@ -166,6 +168,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
           SnackBar(
             content: Text('Error refreshing rates: $e'),
             duration: const Duration(seconds: 2),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -490,10 +493,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
               const SizedBox(height: 16),
               Expanded(
                 child: widget.converterType == ConverterType.currency
-                    ? SearchableCurrencySelector(
-                        key: isSource ? _fromSelectorKey : _toSelectorKey,
-                        value: currentUnit,
+                    ? _CurrencyListWidget(
                         currencies: units,
+                        currentUnit: currentUnit,
                         onChanged: (String? value) {
                           if (value != null) {
                             if (isSource) {
@@ -504,7 +506,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
                           }
                           Navigator.of(context).pop();
                         },
-                        label: label,
                         onStarredChanged: _onStarredCurrencyChanged,
                       )
                     : ListView.builder(
@@ -543,6 +544,19 @@ class _ConverterScreenState extends State<ConverterScreen> {
         title: Text(widget.converterType.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          // Refresh button for currency conversions
+          if (widget.converterType == ConverterType.currency)
+            IconButton(
+              onPressed: _isRefreshing ? null : _refreshExchangeRates,
+              icon: _isRefreshing 
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.refresh),
+              tooltip: 'Refresh exchange rates',
+            ),
           IconButton(
             onPressed: _toggleFavorite,
             icon: Icon(
@@ -729,71 +743,17 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   ],
                 ),
               ),
-              // Calculator section fills remaining space, accounting for info section
+              // Calculator section fills remaining space - removed expression box
               Expanded(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: CalculatorInput(
-                        initialValue: _sourceValue,
-                        onExpressionEvaluated: (value) {
-                          _onCalculatorChanged(value);
-                        },
-                        onExpressionChanged: (value) {
-                          _onCalculatorChanged(value);
-                        },
-                      ),
-                    ),
-                    
-                    // Compact info section for currency
-                    if (widget.converterType == ConverterType.currency) ...[
-                      const SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.update,
-                              size: 16,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                ExchangeRateService.getLastFetchTimeFormatted() ??
-                                    'No exchange rates available',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 11,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            _isRefreshing
-                                ? const SizedBox(
-                                    width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(strokeWidth: 1.5),
-                                  )
-                                : IconButton(
-                                    onPressed: _refreshExchangeRates,
-                                    icon: const Icon(Icons.refresh),
-                                    iconSize: 16,
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-                                    tooltip: 'Refresh exchange rates',
-                                  ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
+                child: CalculatorInput(
+                  initialValue: _sourceValue,
+                  onExpressionEvaluated: (value) {
+                    _onCalculatorChanged(value);
+                  },
+                  onExpressionChanged: (value) {
+                    _onCalculatorChanged(value);
+                  },
+                  hideExpression: true, // Hide the expression box
                 ),
               ),
             ],
@@ -805,6 +765,162 @@ class _ConverterScreenState extends State<ConverterScreen> {
 
   @override
   void dispose() {
+    super.dispose();
+  }
+}
+
+// Simple currency list widget for use inside modal
+class _CurrencyListWidget extends StatefulWidget {
+  final List<String> currencies;
+  final String currentUnit;
+  final Function(String?) onChanged;
+  final VoidCallback onStarredChanged;
+
+  const _CurrencyListWidget({
+    required this.currencies,
+    required this.currentUnit,
+    required this.onChanged,
+    required this.onStarredChanged,
+  });
+
+  @override
+  State<_CurrencyListWidget> createState() => _CurrencyListWidgetState();
+}
+
+class _CurrencyListWidgetState extends State<_CurrencyListWidget> {
+  late List<String> _filteredCurrencies;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredCurrencies = _getSortedCurrencies();
+  }
+
+  List<String> _getSortedCurrencies() {
+    return CurrencyPreferencesService.sortCurrenciesWithStarredFirst(widget.currencies);
+  }
+
+  void _filterCurrencies(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredCurrencies = _getSortedCurrencies();
+      } else {
+        final lowerQuery = query.toLowerCase();
+        _filteredCurrencies = widget.currencies.where((currency) {
+          final currencyLower = currency.toLowerCase();
+          final currencyName = SearchableCurrencySelector.getCurrencyName(currency)?.toLowerCase() ?? '';
+          return currencyLower.contains(lowerQuery) || currencyName.contains(lowerQuery);
+        }).toList();
+
+        // Sort filtered results with starred first, then by relevance
+        _filteredCurrencies.sort((a, b) {
+          final aStarred = CurrencyPreferencesService.isStarred(a);
+          final bStarred = CurrencyPreferencesService.isStarred(b);
+          
+          if (aStarred && !bStarred) return -1;
+          if (!aStarred && bStarred) return 1;
+          
+          // If both have same starred status, sort by relevance (exact match first)
+          final aExact = a.toLowerCase() == lowerQuery;
+          final bExact = b.toLowerCase() == lowerQuery;
+          
+          if (aExact && !bExact) return -1;
+          if (!aExact && bExact) return 1;
+          
+          return a.compareTo(b);
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Search field
+        TextField(
+          controller: _searchController,
+          decoration: const InputDecoration(
+            hintText: 'Search currencies...',
+            prefixIcon: Icon(Icons.search),
+            border: OutlineInputBorder(),
+          ),
+          onChanged: _filterCurrencies,
+        ),
+        const SizedBox(height: 16),
+        // Currency list
+        Expanded(
+          child: ListView.builder(
+            itemCount: _filteredCurrencies.length,
+            itemBuilder: (context, index) {
+              final currency = _filteredCurrencies[index];
+              final isSelected = currency == widget.currentUnit;
+              final isStarred = CurrencyPreferencesService.isStarred(currency);
+              final symbol = SearchableCurrencySelector.getCurrencySymbol(currency);
+              final name = SearchableCurrencySelector.getCurrencyName(currency) ?? '';
+
+              return ListTile(
+                title: Row(
+                  children: [
+                    if (symbol.isNotEmpty) ...[
+                      Text(
+                        symbol,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                    ],
+                    Text(
+                      currency,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                subtitle: name.isNotEmpty ? Text(name) : null,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Star toggle
+                    InkWell(
+                      onTap: () async {
+                        await CurrencyPreferencesService.toggleStarred(currency);
+                        setState(() {
+                          _filteredCurrencies = _getSortedCurrencies();
+                        });
+                        widget.onStarredChanged();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          isStarred ? Icons.star : Icons.star_border,
+                          size: 18,
+                          color: isStarred 
+                              ? Colors.amber 
+                              : Theme.of(context).colorScheme.outline.withOpacity(0.7),
+                        ),
+                      ),
+                    ),
+                    // Check mark for selected
+                    if (isSelected) const Icon(Icons.check),
+                  ],
+                ),
+                selected: isSelected,
+                onTap: () => widget.onChanged(currency),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
     super.dispose();
   }
 } 

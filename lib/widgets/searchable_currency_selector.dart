@@ -402,6 +402,11 @@ class SearchableCurrencySelector extends StatefulWidget {
     return _currencySymbols[currency] ?? '';
   }
 
+  // Static getter to access currency names from outside
+  static String? getCurrencyName(String currency) {
+    return _currencyNames[currency];
+  }
+
   @override
   State<SearchableCurrencySelector> createState() => _SearchableCurrencySelectorState();
 }

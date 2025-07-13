@@ -6,12 +6,14 @@ class CalculatorInput extends StatefulWidget {
   final void Function(String) onExpressionEvaluated;
   final void Function(String)? onExpressionChanged;
   final String? initialValue;
+  final bool hideExpression;
   
   const CalculatorInput({
     super.key,
     required this.onExpressionEvaluated, 
     this.onExpressionChanged,
     this.initialValue,
+    this.hideExpression = false,
   });
 
   @override
@@ -171,20 +173,22 @@ class CalculatorInputState extends State<CalculatorInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Show the current expression above the calculator grid
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
-            borderRadius: BorderRadius.circular(8),
+        // Show the current expression above the calculator grid (conditionally)
+        if (!widget.hideExpression) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              _expression.isEmpty ? '0' : _expression,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500),
+              textAlign: TextAlign.right,
+            ),
           ),
-          child: Text(
-            _expression.isEmpty ? '0' : _expression,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500),
-            textAlign: TextAlign.right,
-          ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         Expanded(
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
