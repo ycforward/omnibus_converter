@@ -128,6 +128,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
           SnackBar(
             content: Text(_isFavorite ? 'Added to favorites' : 'Removed from favorites'),
             duration: const Duration(seconds: 2),
+            backgroundColor: Colors.green, // Use green for consistency
           ),
         );
       }
@@ -537,6 +538,67 @@ class _ConverterScreenState extends State<ConverterScreen> {
     );
   }
 
+  // Helper to get full unit name for all types
+  String _getUnitFullName(String unit) {
+    if (widget.converterType == ConverterType.currency) {
+      return unit;
+    }
+    // For other types, show the full unit name (e.g., Meter, Foot)
+    // If abbreviation is present, show only the full name
+    switch (unit) {
+      case 'Meter': return 'Meter';
+      case 'Foot': return 'Foot';
+      case 'Kilometer': return 'Kilometer';
+      case 'Centimeter': return 'Centimeter';
+      case 'Millimeter': return 'Millimeter';
+      case 'Mile': return 'Mile';
+      case 'Yard': return 'Yard';
+      case 'Inch': return 'Inch';
+      case 'Kilogram': return 'Kilogram';
+      case 'Gram': return 'Gram';
+      case 'Pound': return 'Pound';
+      case 'Ounce': return 'Ounce';
+      case 'Ton': return 'Ton';
+      case 'Stone': return 'Stone';
+      case 'Celsius': return 'Celsius';
+      case 'Fahrenheit': return 'Fahrenheit';
+      case 'Kelvin': return 'Kelvin';
+      case 'Liter': return 'Liter';
+      case 'Milliliter': return 'Milliliter';
+      case 'Gallon': return 'Gallon';
+      case 'Quart': return 'Quart';
+      case 'Pint': return 'Pint';
+      case 'Cup': return 'Cup';
+      case 'Fluid Ounce': return 'Fluid Ounce';
+      case 'Square Meter': return 'Square Meter';
+      case 'Square Kilometer': return 'Square Kilometer';
+      case 'Square Mile': return 'Square Mile';
+      case 'Acre': return 'Acre';
+      case 'Square Yard': return 'Square Yard';
+      case 'Square Foot': return 'Square Foot';
+      case 'Miles per Hour': return 'Miles per Hour';
+      case 'Kilometers per Hour': return 'Kilometers per Hour';
+      case 'Meters per Second': return 'Meters per Second';
+      case 'Knots': return 'Knots';
+      case 'Feet per Second': return 'Feet per Second';
+      case 'Tablespoon': return 'Tablespoon';
+      case 'Teaspoon': return 'Teaspoon';
+      case 'Degree': return 'Degree';
+      case 'Radian': return 'Radian';
+      case 'Gradian': return 'Gradian';
+      case 'Kilogram per Cubic Meter': return 'Kilogram per Cubic Meter';
+      case 'Gram per Cubic Centimeter': return 'Gram per Cubic Centimeter';
+      case 'Pound per Cubic Foot': return 'Pound per Cubic Foot';
+      case 'Joule': return 'Joule';
+      case 'Kilojoule': return 'Kilojoule';
+      case 'Calorie': return 'Calorie';
+      case 'Kilocalorie': return 'Kilocalorie';
+      case 'Watt Hour': return 'Watt Hour';
+      case 'Kilowatt Hour': return 'Kilowatt Hour';
+      default: return unit;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -585,8 +647,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   ),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Unit selector as clickable header
+                    // Unit selector as clickable header (unit name only)
                     InkWell(
                       onTap: () => _showUnitSelector(true), // true for source unit
                       borderRadius: const BorderRadius.only(
@@ -603,44 +666,41 @@ class _ConverterScreenState extends State<ConverterScreen> {
                             topRight: Radius.circular(12),
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Text(
-                              _getUnitDisplayText(_fromUnit),
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _fromUnit,
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const Spacer(),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ],
+                        child: Text(
+                          _getUnitFullName(_fromUnit),
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                    // Value display
+                    // Value display with symbol/abbreviation inline
                     Expanded(
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                _getUnitDisplayText(_fromUnit) + ' ',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -674,8 +734,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   ),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Unit selector as clickable header
+                    // Unit selector as clickable header (unit name only)
                     InkWell(
                       onTap: () => _showUnitSelector(false), // false for target unit
                       borderRadius: const BorderRadius.only(
@@ -692,33 +753,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
                             topRight: Radius.circular(12),
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Text(
-                              _getUnitDisplayText(_toUnit),
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.secondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _toUnit,
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.secondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const Spacer(),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          ],
+                        child: Text(
+                          _getUnitFullName(_toUnit),
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                    // Value display
+                    // Value display with symbol/abbreviation inline
                     Expanded(
                       child: Container(
                         width: double.infinity,
@@ -731,11 +775,25 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
-                              : Text(
-                                  _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      _getUnitDisplayText(_toUnit) + ' ',
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                         ),
                       ),
