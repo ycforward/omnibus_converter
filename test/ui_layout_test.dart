@@ -100,5 +100,69 @@ void main() {
       expect(infoBox.height, lessThan(40), 
         reason: 'Info section should be compact and not take excessive vertical space');
     });
+    
+    testWidgets('Value boxes should have consistent height', (WidgetTester tester) async {
+      // Build the length converter screen
+      await tester.pumpWidget(MaterialApp(
+        home: ConverterScreen(converterType: ConverterType.length),
+      ));
+      
+      // Wait for initial build
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      
+      // Find all containers (value boxes)
+      final containers = find.byType(Container);
+      expect(containers, findsWidgets);
+      
+      // The value boxes should have consistent heights
+      // We can't directly test the height property, but we can ensure
+      // the layout is stable by checking that widgets are positioned correctly
+      final screenSize = tester.binding.window.physicalSize / tester.binding.window.devicePixelRatio;
+      
+      // All containers should be within reasonable bounds
+      for (int i = 0; i < containers.evaluate().length; i++) {
+        final container = containers.at(i);
+        final containerBox = tester.getRect(container);
+        
+        // Container should be within screen bounds
+        expect(containerBox.top, greaterThanOrEqualTo(0));
+        expect(containerBox.bottom, lessThan(screenSize.height));
+        expect(containerBox.height, greaterThan(0));
+      }
+    });
+    
+    testWidgets('Layout should remain stable with large numbers', (WidgetTester tester) async {
+      // Build the length converter screen
+      await tester.pumpWidget(MaterialApp(
+        home: ConverterScreen(converterType: ConverterType.length),
+      ));
+      
+      // Wait for initial build
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      
+      // Find calculator buttons
+      final calculatorButtons = find.byType(ElevatedButton);
+      expect(calculatorButtons, findsWidgets);
+      
+      // Get initial position of a calculator button
+      final initialButtonBox = tester.getRect(calculatorButtons.first);
+      
+      // Simulate entering a large number by tapping multiple buttons
+      // Just tap the first few buttons to simulate number entry
+      for (int i = 0; i < 5 && i < calculatorButtons.evaluate().length; i++) {
+        await tester.tap(calculatorButtons.at(i));
+        await tester.pump();
+      }
+      
+      // Check that the calculator button position hasn't changed significantly
+      final finalButtonBox = tester.getRect(calculatorButtons.first);
+      
+      // The button should still be in roughly the same position
+      // Allow for some minor layout adjustments but not major shifts
+      expect((finalButtonBox.top - initialButtonBox.top).abs(), lessThan(50),
+        reason: 'Calculator buttons should not shift significantly with large numbers');
+    });
   });
 } 

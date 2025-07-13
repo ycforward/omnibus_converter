@@ -235,7 +235,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       
       if (mounted) {
         setState(() {
-          _result = result.toStringAsFixed(4);
+          _result = _formatResult(result);
           _isLoading = false;
         });
       }
@@ -305,6 +305,60 @@ class _ConverterScreenState extends State<ConverterScreen> {
       }
     }
     return _getUnitAbbreviation(unit);
+  }
+
+  String _formatResult(double result) {
+    // Handle very large numbers with scientific notation
+    if (result.abs() >= 1e12) {
+      return result.toStringAsExponential(2);
+    }
+    
+    // For normal numbers, use appropriate decimal places
+    if (result.abs() >= 1000) {
+      // Large numbers: use fewer decimal places
+      return result.toStringAsFixed(0);
+    } else if (result.abs() >= 1) {
+      // Medium numbers: use 2 decimal places
+      return result.toStringAsFixed(2);
+    } else {
+      // Small numbers: use up to 4 decimal places but remove trailing zeros
+      String formatted = result.toStringAsFixed(4);
+      // Remove trailing zeros
+      formatted = formatted.replaceAll(RegExp(r'0+$'), '');
+      if (formatted.endsWith('.')) {
+        formatted = formatted.substring(0, formatted.length - 1);
+      }
+      return formatted;
+    }
+  }
+
+  String _formatDisplayValue(String value) {
+    if (value.isEmpty || value == '0') return '0';
+    
+    final double? number = double.tryParse(value);
+    if (number == null) return value;
+    
+    // Handle very large numbers with scientific notation
+    if (number.abs() >= 1e9) {
+      return number.toStringAsExponential(2);
+    }
+    
+    // Add thousand separators for large numbers
+    if (number.abs() >= 1000) {
+      final parts = value.split('.');
+      final intPart = parts[0];
+      final decPart = parts.length > 1 ? '.${parts[1]}' : '';
+      
+      // Add commas every 3 digits
+      final formatted = intPart.replaceAllMapped(
+        RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+        (match) => '${match[1]},',
+      );
+      
+      return formatted + decPart;
+    }
+    
+    return value;
   }
 
   String _getUnitAbbreviation(String unit) {
@@ -477,6 +531,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                 children: [
                   Expanded(
                     child: Container(
+                      height: 80, // Fixed height for consistent layout
                       margin: const EdgeInsets.only(bottom: 16, right: 8),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -488,15 +543,22 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             _getUnitDisplayText(_fromUnit),
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _sourceValue.isEmpty ? '0' : _sourceValue,
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                _formatDisplayValue(_sourceValue.isEmpty ? '0' : _sourceValue),
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -515,6 +577,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   ),
                   Expanded(
                     child: Container(
+                      height: 80, // Fixed height for consistent layout
                       margin: const EdgeInsets.only(bottom: 16, left: 8),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -526,22 +589,29 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             _getUnitDisplayText(_toUnit),
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
-                          const SizedBox(height: 4),
-                          _isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : Text(
-                                  _result.isEmpty ? '0' : _result,
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                ),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : Text(
+                                      _formatDisplayValue(_result.isEmpty ? '0' : _result),
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
