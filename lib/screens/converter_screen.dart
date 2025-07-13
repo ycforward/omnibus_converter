@@ -685,21 +685,41 @@ class _ConverterScreenState extends State<ConverterScreen> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
-                                _getUnitDisplayText(_fromUnit) + ' ',
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.normal,
+                              // For currency: symbol before value
+                              if (widget.converterType == ConverterType.currency) ...[
+                                Text(
+                                  _getUnitDisplayText(_fromUnit) + ' ',
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
+                                Expanded(
+                                  child: Text(
+                                    _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
+                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
                                 ),
-                              ),
+                              ] else ...[
+                                // For other units: value first, then abbreviation
+                                Expanded(
+                                  child: Text(
+                                    _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
+                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                                Text(
+                                  ' ' + _getUnitDisplayText(_fromUnit),
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -778,21 +798,41 @@ class _ConverterScreenState extends State<ConverterScreen> {
                               : Row(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(
-                                      _getUnitDisplayText(_toUnit) + ' ',
-                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                        fontWeight: FontWeight.normal,
+                                    // For currency: symbol before value
+                                    if (widget.converterType == ConverterType.currency) ...[
+                                      Text(
+                                        _getUnitDisplayText(_toUnit) + ' ',
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
-                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
+                                      Expanded(
+                                        child: Text(
+                                          _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
                                       ),
-                                    ),
+                                    ] else ...[
+                                      // For other units: value first, then abbreviation
+                                      Expanded(
+                                        child: Text(
+                                          _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                      Text(
+                                        ' ' + _getUnitDisplayText(_toUnit),
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
                                   ],
                                 ),
                         ),
