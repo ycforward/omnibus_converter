@@ -53,25 +53,20 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _initializeUnits() {
     final units = _conversionService.getUnits(widget.converterType);
     if (units.isNotEmpty) {
-      if (widget.converterType == ConverterType.currency) {
-        // Use session memory if available, otherwise use defaults
-        if (SessionMemoryService.hasRememberedCurrencies()) {
-          final lastFrom = SessionMemoryService.getLastFromCurrency();
-          final lastTo = SessionMemoryService.getLastToCurrency();
-          
-          // Verify the remembered currencies are still available
-          if (lastFrom != null && lastTo != null && 
-              units.contains(lastFrom) && units.contains(lastTo)) {
-            _fromUnit = lastFrom;
-            _toUnit = lastTo;
-          } else {
-            _setDefaultCurrencies(units);
-          }
-        } else {
-          _setDefaultCurrencies(units);
+      final typeKey = widget.converterType.name;
+      if (SessionMemoryService.hasRememberedUnits(typeKey)) {
+        final lastFrom = SessionMemoryService.getLastFromUnit(typeKey);
+        final lastTo = SessionMemoryService.getLastToUnit(typeKey);
+        if (lastFrom != null && lastTo != null && units.contains(lastFrom) && units.contains(lastTo)) {
+          _fromUnit = lastFrom;
+          _toUnit = lastTo;
+          return;
         }
+      }
+      // Fallback to defaults
+      if (widget.converterType == ConverterType.currency) {
+        _setDefaultCurrencies(units);
       } else {
-        // For other conversions, use first two units
         _fromUnit = units.first;
         _toUnit = units.length > 1 ? units[1] : units.first;
       }
@@ -85,13 +80,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
   }
 
   void _initializeSourceValue() {
-    if (widget.converterType == ConverterType.currency) {
-      // Use remembered source value or default to "1"
-      _sourceValue = SessionMemoryService.getLastSourceValue();
-    } else {
-      // All other converter types should also start with "1"
-      _sourceValue = '1';
-    }
+    final typeKey = widget.converterType.name;
+    _sourceValue = SessionMemoryService.getLastSourceValue(typeKey);
   }
 
   Future<void> _checkFavoriteStatus() async {
@@ -194,12 +184,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
     setState(() {
       _sourceValue = value;
     });
-    
-    // Remember the source value for currency conversions
-    if (widget.converterType == ConverterType.currency) {
-      SessionMemoryService.rememberSourceValue(value);
-    }
-    
+    // Remember the source value for this converter type
+    SessionMemoryService.rememberSourceValue(widget.converterType.name, value);
     _convertLive(value);
   }
 
@@ -248,12 +234,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
       _fromUnit = _toUnit;
       _toUnit = temp;
     });
-    
-    // Remember the new currency pair for currency conversions
-    if (widget.converterType == ConverterType.currency) {
-      SessionMemoryService.rememberCurrencyPair(_fromUnit, _toUnit);
-    }
-    
+    // Remember the new unit pair for this converter type
+    SessionMemoryService.rememberUnitPair(widget.converterType.name, _fromUnit, _toUnit);
     _convertLive(_sourceValue);
     _checkFavoriteStatus();
   }
@@ -263,12 +245,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
       setState(() {
         _fromUnit = value;
       });
-      
-      // Remember the new currency pair for currency conversions
-      if (widget.converterType == ConverterType.currency) {
-        SessionMemoryService.rememberCurrencyPair(_fromUnit, _toUnit);
-      }
-      
+      // Remember the new unit pair for this converter type
+      SessionMemoryService.rememberUnitPair(widget.converterType.name, _fromUnit, _toUnit);
       _convertLive(_sourceValue);
       _checkFavoriteStatus();
     }
@@ -279,12 +257,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
       setState(() {
         _toUnit = value;
       });
-      
-      // Remember the new currency pair for currency conversions
-      if (widget.converterType == ConverterType.currency) {
-        SessionMemoryService.rememberCurrencyPair(_fromUnit, _toUnit);
-      }
-      
+      // Remember the new unit pair for this converter type
+      SessionMemoryService.rememberUnitPair(widget.converterType.name, _fromUnit, _toUnit);
       _convertLive(_sourceValue);
       _checkFavoriteStatus();
     }

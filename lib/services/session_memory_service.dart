@@ -1,46 +1,47 @@
 class SessionMemoryService {
-  static String? _lastFromCurrency;
-  static String? _lastToCurrency;
-  static String? _lastSourceValue;
+  static final Map<String, String> _lastFromUnit = {};
+  static final Map<String, String> _lastToUnit = {};
+  static final Map<String, String> _lastSourceValue = {};
 
-  /// Remember the last used currency pair
-  static void rememberCurrencyPair(String fromCurrency, String toCurrency) {
-    _lastFromCurrency = fromCurrency;
-    _lastToCurrency = toCurrency;
+  /// Remember the last used unit pair for a converter type
+  static void rememberUnitPair(String converterType, String fromUnit, String toUnit) {
+    _lastFromUnit[converterType] = fromUnit;
+    _lastToUnit[converterType] = toUnit;
   }
 
-  /// Remember the last source value
-  static void rememberSourceValue(String value) {
-    _lastSourceValue = value;
+  /// Remember the last source value for a converter type
+  static void rememberSourceValue(String converterType, String value) {
+    _lastSourceValue[converterType] = value;
   }
 
-  /// Get the last used from currency
-  static String? getLastFromCurrency() {
-    return _lastFromCurrency;
+  /// Get the last used from unit for a converter type
+  static String? getLastFromUnit(String converterType) {
+    return _lastFromUnit[converterType];
   }
 
-  /// Get the last used to currency
-  static String? getLastToCurrency() {
-    return _lastToCurrency;
+  /// Get the last used to unit for a converter type
+  static String? getLastToUnit(String converterType) {
+    return _lastToUnit[converterType];
   }
 
-  /// Get the last source value, defaults to "1" if none remembered
-  static String getLastSourceValue() {
-    if (_lastSourceValue == null || _lastSourceValue!.isEmpty) {
+  /// Get the last source value for a converter type, defaults to "1" if none remembered
+  static String getLastSourceValue(String converterType) {
+    final value = _lastSourceValue[converterType];
+    if (value == null || value.isEmpty) {
       return '1';
     }
-    return _lastSourceValue!;
+    return value;
   }
 
-  /// Check if we have remembered currencies
-  static bool hasRememberedCurrencies() {
-    return _lastFromCurrency != null && _lastToCurrency != null;
+  /// Check if we have remembered units for a converter type
+  static bool hasRememberedUnits(String converterType) {
+    return _lastFromUnit[converterType] != null && _lastToUnit[converterType] != null;
   }
 
   /// Clear all session memory (for testing)
   static void clearSession() {
-    _lastFromCurrency = null;
-    _lastToCurrency = null;
-    _lastSourceValue = null;
+    _lastFromUnit.clear();
+    _lastToUnit.clear();
+    _lastSourceValue.clear();
   }
 } 

@@ -3,63 +3,57 @@ import 'package:converter_app/services/session_memory_service.dart';
 
 void main() {
   group('SessionMemoryService Tests', () {
+    const typeKey = 'currency';
     setUp(() {
       // Clear session before each test
       SessionMemoryService.clearSession();
     });
 
-    test('should start with no remembered currencies', () {
-      expect(SessionMemoryService.hasRememberedCurrencies(), false);
-      expect(SessionMemoryService.getLastFromCurrency(), isNull);
-      expect(SessionMemoryService.getLastToCurrency(), isNull);
+    test('should start with no remembered units', () {
+      expect(SessionMemoryService.hasRememberedUnits(typeKey), false);
+      expect(SessionMemoryService.getLastFromUnit(typeKey), isNull);
+      expect(SessionMemoryService.getLastToUnit(typeKey), isNull);
     });
 
-    test('should remember currency pair', () {
-      SessionMemoryService.rememberCurrencyPair('USD', 'EUR');
-      
-      expect(SessionMemoryService.hasRememberedCurrencies(), true);
-      expect(SessionMemoryService.getLastFromCurrency(), 'USD');
-      expect(SessionMemoryService.getLastToCurrency(), 'EUR');
+    test('should remember unit pair', () {
+      SessionMemoryService.rememberUnitPair(typeKey, 'USD', 'EUR');
+      expect(SessionMemoryService.hasRememberedUnits(typeKey), true);
+      expect(SessionMemoryService.getLastFromUnit(typeKey), 'USD');
+      expect(SessionMemoryService.getLastToUnit(typeKey), 'EUR');
     });
 
     test('should remember source value', () {
-      expect(SessionMemoryService.getLastSourceValue(), '1'); // Default
-      
-      SessionMemoryService.rememberSourceValue('100');
-      expect(SessionMemoryService.getLastSourceValue(), '100');
-      
-      SessionMemoryService.rememberSourceValue('42.5');
-      expect(SessionMemoryService.getLastSourceValue(), '42.5');
+      expect(SessionMemoryService.getLastSourceValue(typeKey), '1'); // Default
+      SessionMemoryService.rememberSourceValue(typeKey, '100');
+      expect(SessionMemoryService.getLastSourceValue(typeKey), '100');
+      SessionMemoryService.rememberSourceValue(typeKey, '42.5');
+      expect(SessionMemoryService.getLastSourceValue(typeKey), '42.5');
     });
 
-    test('should update currency pair when changed', () {
-      SessionMemoryService.rememberCurrencyPair('USD', 'EUR');
-      expect(SessionMemoryService.getLastFromCurrency(), 'USD');
-      expect(SessionMemoryService.getLastToCurrency(), 'EUR');
-      
-      SessionMemoryService.rememberCurrencyPair('GBP', 'JPY');
-      expect(SessionMemoryService.getLastFromCurrency(), 'GBP');
-      expect(SessionMemoryService.getLastToCurrency(), 'JPY');
+    test('should update unit pair when changed', () {
+      SessionMemoryService.rememberUnitPair(typeKey, 'USD', 'EUR');
+      expect(SessionMemoryService.getLastFromUnit(typeKey), 'USD');
+      expect(SessionMemoryService.getLastToUnit(typeKey), 'EUR');
+      SessionMemoryService.rememberUnitPair(typeKey, 'GBP', 'JPY');
+      expect(SessionMemoryService.getLastFromUnit(typeKey), 'GBP');
+      expect(SessionMemoryService.getLastToUnit(typeKey), 'JPY');
     });
 
     test('should clear session correctly', () {
-      SessionMemoryService.rememberCurrencyPair('USD', 'EUR');
-      SessionMemoryService.rememberSourceValue('100');
-      
-      expect(SessionMemoryService.hasRememberedCurrencies(), true);
-      expect(SessionMemoryService.getLastSourceValue(), '100');
-      
+      SessionMemoryService.rememberUnitPair(typeKey, 'USD', 'EUR');
+      SessionMemoryService.rememberSourceValue(typeKey, '100');
+      expect(SessionMemoryService.hasRememberedUnits(typeKey), true);
+      expect(SessionMemoryService.getLastSourceValue(typeKey), '100');
       SessionMemoryService.clearSession();
-      
-      expect(SessionMemoryService.hasRememberedCurrencies(), false);
-      expect(SessionMemoryService.getLastFromCurrency(), isNull);
-      expect(SessionMemoryService.getLastToCurrency(), isNull);
-      expect(SessionMemoryService.getLastSourceValue(), '1'); // Back to default
+      expect(SessionMemoryService.hasRememberedUnits(typeKey), false);
+      expect(SessionMemoryService.getLastFromUnit(typeKey), isNull);
+      expect(SessionMemoryService.getLastToUnit(typeKey), isNull);
+      expect(SessionMemoryService.getLastSourceValue(typeKey), '1'); // Back to default
     });
 
     test('should handle empty source value correctly', () {
-      SessionMemoryService.rememberSourceValue('');
-      expect(SessionMemoryService.getLastSourceValue(), '1'); // Should default to '1'
+      SessionMemoryService.rememberSourceValue(typeKey, '');
+      expect(SessionMemoryService.getLastSourceValue(typeKey), '1'); // Should default to '1'
     });
   });
 } 
