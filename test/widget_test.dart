@@ -12,6 +12,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:converter_app/main.dart';
 import 'package:converter_app/screens/converter_screen.dart';
 import 'package:converter_app/screens/home_screen.dart';
+import 'package:converter_app/screens/favorites_screen.dart';
+import 'package:converter_app/models/favorite_conversion.dart';
 import 'package:converter_app/models/converter_type.dart';
 import 'package:converter_app/widgets/unit_selector.dart';
 import 'package:converter_app/widgets/searchable_currency_selector.dart';
@@ -409,5 +411,21 @@ void main() {
     
     expect(find.text('EUR'), findsNothing);
     expect(find.text('GBP'), findsNothing);
+  });
+
+  group('UI Layout Tests', () {
+    testWidgets('Favorites tab heart icon is red', (WidgetTester tester) async {
+      await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+      // Find the TabBar
+      final tabBar = find.byType(TabBar);
+      expect(tabBar, findsOneWidget);
+      // Find the red heart icon
+      final redHeart = find.widgetWithIcon(Tab, Icons.favorite).evaluate().where((e) {
+        final icon = e.widget as Tab;
+        final iconWidget = icon.icon as Icon;
+        return iconWidget.color == Colors.red;
+      });
+      expect(redHeart.length, 1);
+    });
   });
 }
