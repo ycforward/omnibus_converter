@@ -152,10 +152,7 @@ void main() {
       // Find InkWell elements (unit selector headers)
       final unitSelectorHeaders = find.byType(InkWell);
       expect(unitSelectorHeaders, findsAtLeastNWidgets(2));
-      
-      // Each unit selector should have a dropdown arrow
-      final dropdownArrows = find.byIcon(Icons.arrow_drop_down);
-      expect(dropdownArrows, findsAtLeastNWidgets(2));
+      // No longer check for dropdown arrow icons, as the new design omits them
     });
   });
 } 

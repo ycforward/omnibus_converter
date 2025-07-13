@@ -14,14 +14,14 @@ class HomeScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Unit Converter'),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(
+              const Tab(
                 icon: Icon(Icons.calculate),
                 text: 'Converters',
               ),
               Tab(
-                icon: Icon(Icons.favorite),
+                icon: Icon(Icons.favorite, color: Colors.red),
                 text: 'Favorites',
               ),
             ],
@@ -47,28 +47,28 @@ class _ConvertersTab extends StatelessWidget {
       ..sort((a, b) => a.title.compareTo(b.title));
     
     return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 24),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.95,
-              ),
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: sortedTypes.length,
-              itemBuilder: (context, index) {
-                final converterType = sortedTypes[index];
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 0.95,
+                ),
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: sortedTypes.length,
+                itemBuilder: (context, index) {
+                  final converterType = sortedTypes[index];
                 return _ConverterCard(converterType: converterType);
-              },
+                },
+              ),
             ),
-          ),
-        ],
+          ],
       ),
     );
   }

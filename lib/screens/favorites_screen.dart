@@ -54,13 +54,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Favorite removed')),
+          const SnackBar(
+            content: Text('Favorite removed'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error removing favorite')),
+          const SnackBar(
+            content: Text('Error removing favorite'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     }
@@ -95,7 +103,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('All favorites cleared')),
+            const SnackBar(
+              content: Text('All favorites cleared'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
           );
         }
       }
