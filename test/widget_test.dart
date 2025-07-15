@@ -69,7 +69,7 @@ void main() {
       
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
+      home: Scaffold(
             body: SafeArea(
               child: const ConverterScreen(converterType: ConverterType.length),
             ),
@@ -97,7 +97,7 @@ void main() {
       
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
+      home: Scaffold(
             body: SafeArea(
               child: ConverterScreen(converterType: ConverterType.currency),
             ),
@@ -105,7 +105,7 @@ void main() {
         ),
       );
       
-      await tester.pump();
+    await tester.pump();
       
       expect(find.text('Currency'), findsOneWidget);
       // Updated: Look for unit selector InkWell elements instead of SearchableCurrencySelector widgets
@@ -123,8 +123,8 @@ void main() {
       
       await CurrencyPreferencesService.initialize();
       
-      await tester.pumpWidget(
-        MaterialApp(
+    await tester.pumpWidget(
+      MaterialApp(
           home: Scaffold(
             body: SafeArea(
               child: ConverterScreen(converterType: ConverterType.currency),
@@ -150,8 +150,8 @@ void main() {
       
       await CurrencyPreferencesService.initialize();
       
-      await tester.pumpWidget(
-        MaterialApp(
+    await tester.pumpWidget(
+      MaterialApp(
           home: Scaffold(
             body: SafeArea(
               child: ConverterScreen(converterType: ConverterType.currency),
@@ -179,7 +179,7 @@ void main() {
       
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
+      home: Scaffold(
             body: SafeArea(
               child: ConverterScreen(converterType: ConverterType.currency),
             ),

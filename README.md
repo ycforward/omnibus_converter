@@ -14,13 +14,14 @@ A modern Flutter app for converting between different units of measurement.
   - Calculator input with smart formatting and no redundant expression box for currency
   - Large number formatting with thousand separators
 - **Favorites**: Star your favorite currencies for quick access
+- **Remembers Last-Used Units**: All converter types remember your last-used units and value for a seamless experience
 - **Real-time conversion**: Results update as you type
 - **Caching**: Exchange rates are cached for 1 hour to minimize API calls
 
 ## UI/UX Highlights
 
 - **Modal Unit Selection**: Tap the unit name to open a modal bottom sheet for easy unit changes
-- **Value Display**: Unit name appears at the top of each value box; symbol/abbreviation is shown inline and lighter before the value
+- **Value Display**: Unit name appears at the top of each value box; symbol/abbreviation is shown inline and lighter before/after the value as appropriate
 - **Feedback Banners**: Green popup banners provide clear feedback for actions like refreshing rates or starring favorites
 - **No Overlap**: Layout is carefully designed to avoid overlap and ensure readability, even for large numbers
 - **Consistent Experience**: All converter types share a unified, modern look and feel
@@ -30,6 +31,7 @@ A modern Flutter app for converting between different units of measurement.
 - **Client-side calculations**: All unit conversions (except currency) are performed locally using mathematical formulas
 - **Real-time API**: Currency conversion uses UniRateAPI for live exchange rates with fallback to mock data
 - **Test-driven development**: All changes are accompanied by updated tests; code is only committed when all tests pass
+- **All changes are committed only after passing all tests**
 
 ## Getting Started
 
@@ -38,6 +40,38 @@ A modern Flutter app for converting between different units of measurement.
 3. Run `flutter pub get` to install dependencies
 4. (Optional) Set up UniRateAPI for real currency rates (see [API_SETUP.md](API_SETUP.md))
 5. Run `flutter run` to start the app
+
+## Testing on iOS Devices & Simulators
+
+- **Recommended Device Coverage:**
+  - iPhone SE (small screen)
+  - iPhone 8/XR (older hardware, non-notch)
+  - iPhone 13/14/15 (modern, notched)
+  - iPhone 14/15 Pro Max (largest screens)
+- **Best Practice:**
+  - Use Xcode simulators to quickly test on all major screen sizes and iOS versions
+  - Run Flutter integration/UI tests for core flows
+  - Manually spot-check on at least one small, one large, and one recent device
+- **App Store Screenshots:**
+  - Use simulators to generate required screenshots for all device sizes
+
+## iOS Release Process (Summary)
+
+1. **Prepare for Release:**
+   - Update app version/build number in `pubspec.yaml` and Xcode
+   - Review app icon, launch images, and metadata
+   - Remove debug/test code and sensitive data
+2. **Test the Release Build:**
+   - Run `flutter build ios --release`
+   - Open in Xcode, run on a real device in Release mode
+3. **App Store Connect:**
+   - Register your app, fill in metadata, privacy, and upload screenshots
+4. **Archive & Upload:**
+   - In Xcode: Product > Archive > Distribute App > App Store Connect
+5. **Submit for Review:**
+   - Complete all required info and submit
+6. **Release:**
+   - Release immediately or schedule after approval
 
 ## Future Enhancements
 
@@ -54,3 +88,5 @@ A modern Flutter app for converting between different units of measurement.
 - The app uses Material Design 3 theming for a modern look and feel
 - Exchange rates are cached for 1 hour to optimize performance
 - UI/UX is iteratively improved based on user feedback and thorough testing
+- All converter types remember last-used units and value for user convenience
+- All changes are committed only after passing all tests
