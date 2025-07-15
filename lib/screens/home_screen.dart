@@ -84,6 +84,7 @@ class _ConverterCard extends StatelessWidget {
     return Card(
       elevation: 4,
       child: InkWell(
+        key: ValueKey('converter_card_${converterType.name}'),
         onTap: () {
           Navigator.push(
             context,

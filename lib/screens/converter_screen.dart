@@ -674,6 +674,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                 Expanded(
                                   child: Text(
                                     _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
+                                    key: const Key('converter_input'),
                                     style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
@@ -683,6 +684,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                 // For other units: value first, then abbreviation (positioned next to value)
                                 Flexible(
                                   child: RichText(
+                                    key: const Key('converter_input'),
                                     text: TextSpan(
                                       children: [
                                         TextSpan(
@@ -810,6 +812,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                       Expanded(
                                         child: Text(
                                           _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
+                                          key: const Key('converter_result'),
                                           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
@@ -819,6 +822,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                       // For other units: value first, then abbreviation (positioned next to value)
                                       Flexible(
                                         child: RichText(
+                                          key: const Key('converter_result'),
                                           text: TextSpan(
                                             children: [
                                               TextSpan(
