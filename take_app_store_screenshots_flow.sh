@@ -6,7 +6,7 @@
 set -e
 
 SCREENSHOTS_DIR="app_store_screenshots"
-TEST_FILE="integration_test/screenshot_flow_test.dart"
+TEST_FILE="integration_test/screenshot_flow.dart"
 ALL_DEVICES=(
     "iPhone 16 Pro Max"
     "iPhone 16"

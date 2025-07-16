@@ -30,6 +30,13 @@ void main() {
     await tester.pumpAndSettle();
     await pauseForScreenshot('currency_converter', tester);
 
+    // Favorite the current conversion (tap the heart icon)
+    final favoriteButton = find.byIcon(Icons.favorite_border);
+    if (tester.any(favoriteButton)) {
+      await tester.tap(favoriteButton);
+      await tester.pumpAndSettle();
+    }
+
     // Length converter
     final backButton = find.byTooltip('Back');
     if (tester.any(backButton)) {
