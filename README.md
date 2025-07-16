@@ -83,10 +83,16 @@ A modern Flutter app for converting between different units of measurement.
 bash run_ios_tests.sh
 ```
 
+**Automated Screenshot Generation:**
+The app uses Flutter integration tests to automatically navigate through key scenarios and capture screenshots at precise moments. This ensures consistent, high-quality App Store screenshots.
+
 **Screenshot Generation:**
 ```bash
-# Generate App Store screenshots with manual navigation
-bash take_app_store_screenshots_simple.sh
+# Generate App Store screenshots with automated integration test flow
+bash take_app_store_screenshots_flow.sh
+
+# Generate screenshots for a specific device
+bash take_app_store_screenshots_flow.sh "iPhone 16 Pro Max"
 ```
 
 ### Device & iOS Version Strategy
