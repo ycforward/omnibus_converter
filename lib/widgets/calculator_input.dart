@@ -128,7 +128,7 @@ class CalculatorInputState extends State<CalculatorInput> {
       if (eval is double && eval == eval.roundToDouble()) {
         _result = eval.toInt().toString();
       } else {
-        _result = eval.toString();
+      _result = eval.toString();
       }
     } catch (e) {
       _result = 'Error';
@@ -175,19 +175,19 @@ class CalculatorInputState extends State<CalculatorInput> {
       children: [
         // Show the current expression above the calculator grid (conditionally)
         if (!widget.hideExpression) ...[
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceVariant,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              _expression.isEmpty ? '0' : _expression,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500),
-              textAlign: TextAlign.right,
-            ),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(8),
           ),
-          const SizedBox(height: 8),
+          child: Text(
+            _expression.isEmpty ? '0' : _expression,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500),
+            textAlign: TextAlign.right,
+          ),
+        ),
+        const SizedBox(height: 8),
         ],
         Expanded(
           child: GridView.builder(

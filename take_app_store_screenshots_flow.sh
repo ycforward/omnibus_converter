@@ -58,24 +58,30 @@ main() {
         log_info "Booting simulator $device ($device_udid)"
         xcrun simctl boot "$device_udid" 2>/dev/null || true
         sleep 5
+        device_dir="$SCREENSHOTS_DIR/${device// /_}"
+        mkdir -p "$device_dir"
         log_info "Running integration test for $device..."
-        # Run the test and capture output
-        flutter test "$TEST_FILE" -d "$device" 2>&1 | tee temp_test_output.log
+        # Run the test in the background and capture output
+        flutter test "$TEST_FILE" -d "$device" 2>&1 | tee temp_test_output.log &
+        test_pid=$!
+        # Take screenshots in real time as markers appear
         for scenario in "${SCENARIOS[@]}"; do
-            # Use grep with proper pattern matching
-            if grep -- "---SCREENSHOT:$scenario---" temp_test_output.log > /dev/null; then
-                log_info "Taking screenshot for $scenario on $device..."
-                screenshot_path="$SCREENSHOTS_DIR/${device// /_}_${scenario}.png"
-                xcrun simctl io "$device_udid" screenshot "$screenshot_path"
-                if [ -f "$screenshot_path" ]; then
-                    log_success "Screenshot saved: $screenshot_path"
-                else
-                    log_error "Failed to save screenshot: $screenshot_path"
+            while true; do
+                if tail -n 1 temp_test_output.log | grep -- "---SCREENSHOT:$scenario---" > /dev/null; then
+                    log_info "Taking screenshot for $scenario on $device..."
+                    screenshot_path="$device_dir/${scenario}.png"
+                    xcrun simctl io "$device_udid" screenshot "$screenshot_path"
+                    if [ -f "$screenshot_path" ]; then
+                        log_success "Screenshot saved: $screenshot_path"
+                    else
+                        log_error "Failed to save screenshot: $screenshot_path"
+                    fi
+                    break
                 fi
-            else
-                log_warning "Marker for $scenario not found in test output for $device."
-            fi
+                sleep 0.5
+            done
         done
+        wait $test_pid
         xcrun simctl shutdown "$device_udid" 2>/dev/null || true
     done
     rm -f temp_test_output.log

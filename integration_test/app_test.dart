@@ -238,7 +238,7 @@ void main() {
       app.main();
       await tester.pumpAndSettle();
       await navigateToConverter(tester, 'currency');
-      
+
       // Wait a bit for the screen to fully load and favorite button to appear
       await tester.pumpAndSettle();
       
@@ -247,14 +247,14 @@ void main() {
       expect(favoriteButton, findsOneWidget, reason: "Favorite button should be visible");
       await tester.tap(favoriteButton);
       await tester.pumpAndSettle();
-      
+
       // Verify it was favorited by checking for the filled heart icon
       expect(find.byIcon(Icons.favorite), findsOneWidget);
-      
+
       // Unfavorite it by tapping the filled heart
       await tester.tap(find.byIcon(Icons.favorite).first);
       await tester.pumpAndSettle();
-      
+
       // Verify it was unfavorited
       expect(find.byIcon(Icons.favorite_border), findsOneWidget);
     });

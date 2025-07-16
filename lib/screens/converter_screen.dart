@@ -67,8 +67,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
       if (widget.converterType == ConverterType.currency) {
         _setDefaultCurrencies(units);
       } else {
-        _fromUnit = units.first;
-        _toUnit = units.length > 1 ? units[1] : units.first;
+      _fromUnit = units.first;
+      _toUnit = units.length > 1 ? units[1] : units.first;
       }
     }
   }
@@ -200,7 +200,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
     setState(() {
       _isLoading = true;
     });
-    _performConversion(input);
+      _performConversion(input);
   }
 
   Future<void> _performConversion(double input) async {
@@ -213,17 +213,17 @@ class _ConverterScreenState extends State<ConverterScreen> {
       );
       
       if (mounted) {
-        setState(() {
+      setState(() {
           _result = _formatResult(result);
-          _isLoading = false;
-        });
+        _isLoading = false;
+      });
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _result = 'Error: $e';
-          _isLoading = false;
-        });
+      setState(() {
+        _result = 'Error: $e';
+        _isLoading = false;
+      });
       }
     }
   }
@@ -602,16 +602,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
               Container(
                 height: 120, // Increased height to accommodate unit selector
                 margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                  ),
-                ),
-                child: Column(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+                        children: [
                     // Unit selector as clickable header (unit name only)
                     InkWell(
                       onTap: () => _showUnitSelector(true), // true for source unit
@@ -642,7 +642,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                 color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.w600,
                               ),
-                            ),
+                          ),
                             const Icon(
                               Icons.keyboard_arrow_down_rounded,
                               color: Colors.black38,
@@ -664,7 +664,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                             children: [
                               // For currency: symbol before value
                               if (widget.converterType == ConverterType.currency) ...[
-                                Text(
+                          Text(
                                   _getUnitDisplayText(_fromUnit) + ' ',
                                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -675,11 +675,11 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   child: Text(
                                     _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
                                     key: const Key('converter_input'),
-                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
-                                  ),
-                                ),
+                      ),
+                    ),
                               ] else ...[
                                 // For other units: value first, then abbreviation (positioned next to value)
                                 Flexible(
@@ -734,16 +734,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
               Container(
                 height: 120, // Increased height to accommodate unit selector
                 margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                  ),
-                ),
-                child: Column(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+                        children: [
                     // Unit selector as clickable header (unit name only)
                     InkWell(
                       onTap: () => _showUnitSelector(false), // false for target unit
@@ -774,7 +774,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                 color: Theme.of(context).colorScheme.secondary,
                                 fontWeight: FontWeight.w600,
                               ),
-                            ),
+                          ),
                             const Icon(
                               Icons.keyboard_arrow_down_rounded,
                               color: Colors.black38,
@@ -813,11 +813,11 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                         child: Text(
                                           _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
                                           key: const Key('converter_result'),
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
                                         ),
-                                      ),
+                                ),
                                     ] else ...[
                                       // For other units: value first, then abbreviation (positioned next to value)
                                       Flexible(
@@ -838,8 +838,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                                                   fontWeight: FontWeight.normal,
                                                 ),
-                                              ),
-                                            ],
+                  ),
+                ],
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
@@ -865,8 +865,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     _onCalculatorChanged(value);
                   },
                   hideExpression: true, // Hide the expression box
-                ),
-              ),
+                          ),
+                        ),
             ],
           ),
         ),
