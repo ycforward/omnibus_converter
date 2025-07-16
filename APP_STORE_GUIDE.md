@@ -108,10 +108,10 @@ bash run_ios_tests.sh
 - iPhone 14 Plus
 - iPhone SE (3rd generation)
 
-### **2. Screenshot Generation Script (`take_app_store_screenshots_reliable.sh`)**
+### **2. Screenshot Generation Script (`take_app_store_screenshots_simple.sh`)**
 ```bash
 # Generate App Store screenshots
-bash take_app_store_screenshots_reliable.sh
+bash take_app_store_screenshots_simple.sh
 ```
 
 **Generates screenshots for:**
