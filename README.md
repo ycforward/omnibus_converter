@@ -73,6 +73,57 @@ A modern Flutter app for converting between different units of measurement.
 6. **Release:**
    - Release immediately or schedule after approval
 
+## App Store Screenshot Generation & Testing
+
+### Automated Testing Scripts
+
+**Integration Tests on All iPhone Models:**
+```bash
+# Test app functionality on all major iPhone models
+bash run_ios_tests.sh
+```
+
+**Screenshot Generation:**
+```bash
+# Generate App Store screenshots with manual navigation
+bash take_app_store_screenshots_simple.sh
+```
+
+### Device & iOS Version Strategy
+
+**Device Compatibility:**
+- **Primary**: iPhone 16 Pro Max (for App Store screenshots)
+- **Testing**: All major iPhone models (SE to Pro Max)
+- **Target**: iOS 16.0+ for maximum user reach
+
+**iOS Version Testing:**
+- **Primary**: iOS 18.x (latest features)
+- **Compatibility**: iOS 17.x (90% of users)
+- **Minimum**: iOS 16.x (95% of users)
+
+### Screenshot Requirements
+
+**Required Screenshots (Minimum 3):**
+1. Home screen (app overview)
+2. Active conversion (currency/length/temperature)
+3. Key feature (unit selection, calculator, favorites)
+
+**Recommended Additional:**
+- Unit selection modal
+- Calculator input interface
+- Favorites tab
+- Different converter types
+
+### Best Practices
+
+- **Use iPhone 16 Pro Max screenshots** for main App Store listing
+- **Test on iOS 17+** for broad compatibility
+- **Generate screenshots using simulators** (no device frames)
+- **Show actual app content**, not placeholder text
+- **Include multiple converter types** to demonstrate value
+
+For detailed guidance, see [APP_STORE_GUIDE.md](APP_STORE_GUIDE.md).
+
 ## Future Enhancements
 
 - More conversion types
