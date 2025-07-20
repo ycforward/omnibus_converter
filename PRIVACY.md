@@ -1,15 +1,15 @@
-# Privacy Policy for OmnibusConvert
+# Privacy Policy for OmnibusConverter
 
 **Last updated:** July 16, 2024
 
 ## Introduction
 
-OmnibusConvert ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our unit and currency converter application.
+OmnibusConverter ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our unit and currency converter application.
 
 ## Information We Collect
 
 ### Personal Information
-OmnibusConvert does not collect, store, or transmit any personal information about you. We do not require user accounts, registration, or any personal data to function.
+OmnibusConverter does not collect, store, or transmit any personal information about you. We do not require user accounts, registration, or any personal data to function.
 
 ### Usage Data
 - **Local Storage:** The app stores your favorite conversions and preferences locally on your device using iOS's standard storage mechanisms
@@ -46,7 +46,7 @@ Since we do not collect personal information, there is no personal data to acces
 
 ## Children's Privacy
 
-OmnibusConvert does not knowingly collect any personal information from children under 13. The app is suitable for all ages and does not require any personal data to function.
+OmnibusConverter does not knowingly collect any personal information from children under 13. The app is suitable for all ages and does not require any personal data to function.
 
 ## Changes to This Policy
 
@@ -68,4 +68,4 @@ This privacy policy complies with:
 
 ---
 
-**OmnibusConvert** - Making unit conversion simple and private. 
+**OmnibusConverter** - Making unit conversion simple and private. 
