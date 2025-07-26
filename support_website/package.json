@@ -1,0 +1,22 @@
+{
+  "name": "omnibusconverter-support",
+  "version": "1.0.0",
+  "description": "Support website for OmnibusConverter app",
+  "scripts": {
+    "deploy": "../deploy-netlify.sh",
+    "deploy:netlify": "netlify deploy --prod --dir=.",
+    "dev": "python3 -m http.server 8000",
+    "test": "echo 'Open http://localhost:8000 to test locally' && python3 -m http.server 8000"
+  },
+  "keywords": [
+    "support",
+    "website",
+    "omnibusconverter",
+    "netlify"
+  ],
+  "author": "OmnibusConverter Team",
+  "license": "MIT",
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+} 

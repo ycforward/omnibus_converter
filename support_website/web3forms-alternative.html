@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmnibusConverter Support - Web3Forms Version</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="app-icon.png">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <img src="app-icon.png" alt="OmnibusConverter" class="app-icon">
+                <div class="app-info">
+                    <h1>OmnibusConverter</h1>
+                    <p class="tagline">Your Ultimate Unit Conversion Companion</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="hero-section">
+                <h2>Need Help?</h2>
+                <p>We're here to help you get the most out of OmnibusConverter. Whether you have a question, found a bug, or want to suggest a feature, we'd love to hear from you.</p>
+            </section>
+
+            <section class="contact-section">
+                <div class="contact-form-container">
+                    <h3>Contact Support</h3>
+                    <form id="contactForm" class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+                        <!-- Web3Forms Access Key - Get free key from https://web3forms.com -->
+                        <input type="hidden" name="access_key" value="YOUR-WEB3FORMS-KEY">
+                        <input type="hidden" name="subject" value="OmnibusConverter Support Request">
+                        
+                        <div class="form-group">
+                            <label for="name">Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject *</label>
+                            <select id="subject" name="subject" required>
+                                <option value="">Select a topic</option>
+                                <option value="General Question">General Question</option>
+                                <option value="Bug Report">Bug Report</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="Technical Support">Technical Support</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" rows="6" required placeholder="Please describe your question or issue in detail..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Rest of the content remains the same -->
+            <section class="faq-section">
+                <h3>Frequently Asked Questions</h3>
+                <div class="faq-item">
+                    <h4>How do I add a conversion to my favorites?</h4>
+                    <p>Tap the heart icon next to any conversion to add it to your favorites. You can access all your favorite conversions from the Favorites tab.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>Can I use the calculator while converting units?</h4>
+                    <p>Yes! Tap the calculator icon in the input field to open the built-in calculator for complex calculations.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>How do I switch between different unit types?</h4>
+                    <p>Use the unit type selector at the top of the screen to switch between Length, Area, Volume, Weight, Temperature, and Currency conversions.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h4>Is my data stored locally?</h4>
+                    <p>Yes, all your favorites and preferences are stored locally on your device for privacy and offline access.</p>
+                </div>
+            </section>
+
+            <section class="app-info-section">
+                <h3>About OmnibusConverter</h3>
+                <p>OmnibusConverter is a comprehensive unit conversion app that helps you convert between different units of measurement quickly and accurately. From basic conversions to complex calculations, we've got you covered.</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <h4>📏 Multiple Unit Types</h4>
+                        <p>Length, Area, Volume, Weight, Temperature, and Currency</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🧮 Built-in Calculator</h4>
+                        <p>Perform complex calculations while converting units</p>
+                    </div>
+                    <div class="feature">
+                        <h4>❤️ Favorites</h4>
+                        <p>Save your most-used conversions for quick access</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🔒 Privacy First</h4>
+                        <p>All data stored locally on your device</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 OmnibusConverter. All rights reserved.</p>
+            <p>Version 1.0.0</p>
+        </footer>
+    </div>
+
+    <script>
+        // Web3Forms success handling
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            // Web3Forms will handle the submission automatically
+            // We just need to show success message after redirect
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }, 3000);
+        });
+    </script>
+</body>
+</html> 
