@@ -52,5 +52,28 @@ magick ios_icons/Icon-App-1024x1024@1x.png -resize 144x144 android_icons/ic_laun
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 192x192 android_icons/ic_launcher-xxxhdpi.png
 
 echo "✅ All conversion-themed icons generated successfully!"
-echo "📁 iOS icons saved in: ios_icons/"
-echo "📁 Android icons saved in: android_icons/" 
+
+# Move iOS icons to the correct location
+echo "📱 Moving iOS icons to app location..."
+cp ios_icons/* ios/Runner/Assets.xcassets/AppIcon.appiconset/
+
+# Move Android icons to the correct locations
+echo "🤖 Moving Android icons to app locations..."
+cp android_icons/ic_launcher-mdpi.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+cp android_icons/ic_launcher-hdpi.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+cp android_icons/ic_launcher-xhdpi.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+cp android_icons/ic_launcher-xxhdpi.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+cp android_icons/ic_launcher-xxxhdpi.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+# Update support website icon
+echo "🌐 Updating support website icon..."
+cp ios_icons/Icon-App-1024x1024@1x.png support_website/app-icon.png
+
+# Clean up temporary folders
+echo "🧹 Cleaning up temporary files..."
+rm -rf ios_icons android_icons
+
+echo "🎉 Icon generation and deployment complete!"
+echo "📱 iOS icons updated in: ios/Runner/Assets.xcassets/AppIcon.appiconset/"
+echo "🤖 Android icons updated in: android/app/src/main/res/mipmap-*/"
+echo "🌐 Support website icon updated in: support_website/app-icon.png" 
