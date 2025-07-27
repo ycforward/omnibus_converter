@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function handleFormSubmit(event) {
-    event.preventDefault();
-    
     const formData = new FormData(event.target);
     const submitBtn = event.target.querySelector('.submit-btn');
     const originalText = submitBtn.textContent;
@@ -28,20 +26,31 @@ function handleFormSubmit(event) {
         message: formData.get('message')
     };
     
-    // Use Netlify Forms for form submission (free service)
-    // The form will be handled automatically by Netlify when deployed
-    // For local testing, we'll simulate success
-    console.log('Form data:', data);
-    
-    // Simulate successful submission for local testing
-    // When deployed to Netlify, this will work automatically
-    setTimeout(() => {
-        showMessage('Thank you! Your message has been sent successfully. We\'ll get back to you soon.', 'success');
-        event.target.reset();
-        // Reset button state
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }, 1000);
+    // Check if we're on Netlify (production)
+    if (window.location.hostname.includes('netlify.app')) {
+        // On Netlify, let the form submit naturally to Netlify Forms
+        // Don't prevent default - let Netlify handle it
+        console.log('Submitting to Netlify Forms:', data);
+        
+        // Show success message after a short delay
+        setTimeout(() => {
+            showMessage('Thank you! Your message has been sent successfully. We\'ll get back to you soon.', 'success');
+            event.target.reset();
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }, 2000);
+    } else {
+        // Local development - simulate submission
+        event.preventDefault();
+        console.log('Local development - simulating form submission:', data);
+        
+        setTimeout(() => {
+            showMessage('Thank you! Your message has been sent successfully. We\'ll get back to you soon.', 'success');
+            event.target.reset();
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }, 1000);
+    }
 }
 
 function showMessage(message, type) {
