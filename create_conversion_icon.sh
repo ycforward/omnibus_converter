@@ -1,30 +1,23 @@
 #!/bin/bash
 
-echo "🎨 Creating professional conversion-themed app icon with purple gradient..."
+echo "🎨 Creating app icon with purple gradient and circular arrow design..."
 
 # Create output directories
 mkdir -p ios_icons
 mkdir -p android_icons
 
-# Create a professional conversion-themed icon with purple gradient background
+# Create the exact icon design from the attached image
 echo "📱 Generating iOS icons..."
 
-# 1024x1024 base icon with conversion design
+# 1024x1024 base icon with purple gradient and circular arrow
 magick -size 1024x1024 gradient:'#8b5cf6-#a855f7' \
-  -fill white -draw "rectangle 200,200 824,824" \
-  -fill '#8b5cf6' -draw "rectangle 220,220 804,804" \
-  -fill white -draw "rectangle 240,240 784,784" \
-  -fill '#8b5cf6' -draw "rectangle 300,300 400,400" \
-  -fill '#8b5cf6' -draw "circle 600,350 600,300" \
-  -fill white -stroke '#8b5cf6' -strokewidth 12 -draw "line 450,350 550,350" \
-  -fill '#8b5cf6' -draw "polygon 540,340 550,350 540,360" \
-  -fill '#8b5cf6' -draw "polygon 460,340 450,350 460,360" \
-  -fill white -stroke '#8b5cf6' -strokewidth 12 -draw "line 450,450 550,450" \
-  -fill '#8b5cf6' -draw "polygon 540,440 550,450 540,460" \
-  -fill '#8b5cf6' -draw "polygon 460,440 450,450 460,460" \
-  -fill '#8b5cf6' -pointsize 60 -gravity center -annotate +0+200 "UNIT" \
-  -fill '#8b5cf6' -pointsize 60 -gravity center -annotate +0+260 "CONVERTER" \
-  -fill '#8b5cf6' -pointsize 20 -gravity center -annotate +0+320 "Length • Area • Volume • Weight • Temperature • Currency" \
+  -fill white -draw "circle 512,512 512,200" \
+  -fill '#8b5cf6' -draw "circle 512,512 512,180" \
+  -fill white -stroke '#8b5cf6' -strokewidth 20 -draw "circle 512,512 512,160" \
+  -fill '#8b5cf6' -draw "polygon 512,400 480,450 544,450" \
+  -fill '#8b5cf6' -draw "polygon 512,624 480,574 544,574" \
+  -fill '#8b5cf6' -draw "polygon 400,512 450,480 450,544" \
+  -fill '#8b5cf6' -draw "polygon 624,512 574,480 574,544" \
   ios_icons/Icon-App-1024x1024@1x.png
 
 # Generate all iOS sizes
@@ -51,7 +44,7 @@ magick ios_icons/Icon-App-1024x1024@1x.png -resize 96x96 android_icons/ic_launch
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 144x144 android_icons/ic_launcher-xxhdpi.png
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 192x192 android_icons/ic_launcher-xxxhdpi.png
 
-echo "✅ All conversion-themed icons generated successfully!"
+echo "✅ All icons generated successfully!"
 
 # Move iOS icons to the correct location
 echo "📱 Moving iOS icons to app location..."
