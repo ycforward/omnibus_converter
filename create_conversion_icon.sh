@@ -10,15 +10,12 @@ mkdir -p android_icons
 echo "📱 Generating iOS icons..."
 
 # 1024x1024 base icon with purple gradient and circular arrow
-magick -size 1024x1024 gradient:'#8b5cf6-#a855f7' \
-  -fill white -draw "circle 512,512 512,200" \
-  -fill '#8b5cf6' -draw "circle 512,512 512,180" \
-  -fill white -stroke '#8b5cf6' -strokewidth 20 -draw "circle 512,512 512,160" \
-  -fill '#8b5cf6' -draw "polygon 512,400 480,450 544,450" \
-  -fill '#8b5cf6' -draw "polygon 512,624 480,574 544,574" \
-  -fill '#8b5cf6' -draw "polygon 400,512 450,480 450,544" \
-  -fill '#8b5cf6' -draw "polygon 624,512 574,480 574,544" \
-  ios_icons/Icon-App-1024x1024@1x.png
+# magick -size 1024x1024 xc:"#7B4DFF" \
+#   -fill white -draw "circle 512,512 512,300" \
+#   -fill '#7B4DFF' -draw "circle 512,512 512,350" \
+#   -fill white -draw "path 'M 512,300 A 212,212 0 0 1 700,512 L 670,500 L 740,480 L 720,560 L 700,530 A 212,212 0 0 1 512,724'" \
+#   -fill white -draw "path 'M 512,724 A 212,212 0 0 1 324,512 L 354,524 L 284,544 L 304,464 L 324,494 A 212,212 0 0 1 512,300'" \
+#   ios_icons/Icon-App-1024x1024@1x.png
 
 # Generate all iOS sizes
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 20x20 ios_icons/Icon-App-20x20@1x.png
