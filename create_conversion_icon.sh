@@ -1,30 +1,30 @@
 #!/bin/bash
 
-echo "🎨 Creating conversion-themed app icon with light purple and white..."
+echo "🎨 Creating professional conversion-themed app icon with purple gradient..."
 
 # Create output directories
 mkdir -p ios_icons
 mkdir -p android_icons
 
-# Create a conversion-themed icon with light purple background and white elements
+# Create a professional conversion-themed icon with purple gradient background
 echo "📱 Generating iOS icons..."
 
 # 1024x1024 base icon with conversion design
-magick -size 1024x1024 xc:'#f3f4f6' \
-  -fill '#8b5cf6' -draw "rectangle 0,0 1024,1024" \
+magick -size 1024x1024 gradient:'#8b5cf6-#a855f7' \
   -fill white -draw "rectangle 200,200 824,824" \
   -fill '#8b5cf6' -draw "rectangle 220,220 804,804" \
   -fill white -draw "rectangle 240,240 784,784" \
-  -fill '#8b5cf6' -draw "polygon 300,300 400,300 400,400 300,400" \
+  -fill '#8b5cf6' -draw "rectangle 300,300 400,400" \
   -fill '#8b5cf6' -draw "circle 600,350 600,300" \
-  -fill white -stroke '#8b5cf6' -strokewidth 8 -draw "line 450,350 550,350" \
+  -fill white -stroke '#8b5cf6' -strokewidth 12 -draw "line 450,350 550,350" \
   -fill '#8b5cf6' -draw "polygon 540,340 550,350 540,360" \
   -fill '#8b5cf6' -draw "polygon 460,340 450,350 460,360" \
-  -fill white -stroke '#8b5cf6' -strokewidth 8 -draw "line 450,450 550,450" \
+  -fill white -stroke '#8b5cf6' -strokewidth 12 -draw "line 450,450 550,450" \
   -fill '#8b5cf6' -draw "polygon 540,440 550,450 540,460" \
   -fill '#8b5cf6' -draw "polygon 460,440 450,450 460,460" \
-  -fill '#8b5cf6' -pointsize 48 -gravity center -annotate +0+200 "CONVERT" \
-  -fill '#8b5cf6' -pointsize 24 -gravity center -annotate +0+280 "Length • Area • Volume • Weight • Temperature • Currency" \
+  -fill '#8b5cf6' -pointsize 60 -gravity center -annotate +0+200 "UNIT" \
+  -fill '#8b5cf6' -pointsize 60 -gravity center -annotate +0+260 "CONVERTER" \
+  -fill '#8b5cf6' -pointsize 20 -gravity center -annotate +0+320 "Length • Area • Volume • Weight • Temperature • Currency" \
   ios_icons/Icon-App-1024x1024@1x.png
 
 # Generate all iOS sizes
