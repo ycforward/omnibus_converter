@@ -8,6 +8,13 @@ set -e
 SCREENSHOTS_DIR="app_store_screenshots"
 TEST_FILE="integration_test/screenshot_flow.dart"
 ALL_DEVICES=(
+    "iPhone 16 Pro Max"
+    "iPhone 16 Pro"
+    "iPhone 16"
+    "iPhone 16 Plus"
+    "iPhone 15 Pro"
+    "iPhone 14 Plus"
+    "iPhone SE (3rd generation)"
     "iPad Pro 13-inch (M4)"
     "iPad Pro 11-inch (M4)"
     "iPad Air 13-inch (M3)"
