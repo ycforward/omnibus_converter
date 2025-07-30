@@ -17,29 +17,29 @@ echo "📱 Generating iOS icons from app_icon.png..."
 # Resize the source icon to exactly 1024x1024 and remove alpha channel for App Store
 magick app_icon.png -resize 1024x1024! -background white -alpha remove -alpha off ios_icons/Icon-App-1024x1024@1x.png
 
-# Generate all iOS sizes from the source icon
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 20x20 ios_icons/Icon-App-20x20@1x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 40x40 ios_icons/Icon-App-20x20@2x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 60x60 ios_icons/Icon-App-20x20@3x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 29x29 ios_icons/Icon-App-29x29@1x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 58x58 ios_icons/Icon-App-29x29@2x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 87x87 ios_icons/Icon-App-29x29@3x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 40x40 ios_icons/Icon-App-40x40@1x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 80x80 ios_icons/Icon-App-40x40@2x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 120x120 ios_icons/Icon-App-40x40@3x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 120x120 ios_icons/Icon-App-60x60@2x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 180x180 ios_icons/Icon-App-60x60@3x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 76x76 ios_icons/Icon-App-76x76@1x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 152x152 ios_icons/Icon-App-76x76@2x.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 167x167 ios_icons/Icon-App-83.5x83.5@2x.png
+# Generate all iOS sizes from the original app_icon.png (preserving transparency)
+magick app_icon.png -resize 20x20 ios_icons/Icon-App-20x20@1x.png
+magick app_icon.png -resize 40x40 ios_icons/Icon-App-20x20@2x.png
+magick app_icon.png -resize 60x60 ios_icons/Icon-App-20x20@3x.png
+magick app_icon.png -resize 29x29 ios_icons/Icon-App-29x29@1x.png
+magick app_icon.png -resize 58x58 ios_icons/Icon-App-29x29@2x.png
+magick app_icon.png -resize 87x87 ios_icons/Icon-App-29x29@3x.png
+magick app_icon.png -resize 40x40 ios_icons/Icon-App-40x40@1x.png
+magick app_icon.png -resize 80x80 ios_icons/Icon-App-40x40@2x.png
+magick app_icon.png -resize 120x120 ios_icons/Icon-App-40x40@3x.png
+magick app_icon.png -resize 120x120 ios_icons/Icon-App-60x60@2x.png
+magick app_icon.png -resize 180x180 ios_icons/Icon-App-60x60@3x.png
+magick app_icon.png -resize 76x76 ios_icons/Icon-App-76x76@1x.png
+magick app_icon.png -resize 152x152 ios_icons/Icon-App-76x76@2x.png
+magick app_icon.png -resize 167x167 ios_icons/Icon-App-83.5x83.5@2x.png
 
-# Android Icon Sizes
+# Android Icon Sizes (preserving transparency)
 echo "🤖 Generating Android icons from app_icon.png..."
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 48x48 android_icons/ic_launcher-mdpi.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 72x72 android_icons/ic_launcher-hdpi.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 96x96 android_icons/ic_launcher-xhdpi.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 144x144 android_icons/ic_launcher-xxhdpi.png
-magick ios_icons/Icon-App-1024x1024@1x.png -resize 192x192 android_icons/ic_launcher-xxxhdpi.png
+magick app_icon.png -resize 48x48 android_icons/ic_launcher-mdpi.png
+magick app_icon.png -resize 72x72 android_icons/ic_launcher-hdpi.png
+magick app_icon.png -resize 96x96 android_icons/ic_launcher-xhdpi.png
+magick app_icon.png -resize 144x144 android_icons/ic_launcher-xxhdpi.png
+magick app_icon.png -resize 192x192 android_icons/ic_launcher-xxxhdpi.png
 
 echo "✅ All icons generated successfully from app_icon.png!"
 
