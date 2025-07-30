@@ -14,8 +14,8 @@ fi
 
 echo "📱 Generating iOS icons from app_icon.png..."
 
-# Copy the source icon as the 1024x1024 base icon
-cp app_icon.png ios_icons/Icon-App-1024x1024@1x.png
+# Resize the source icon to exactly 1024x1024 as the base icon
+magick app_icon.png -resize 1024x1024! ios_icons/Icon-App-1024x1024@1x.png
 
 # Generate all iOS sizes from the source icon
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 20x20 ios_icons/Icon-App-20x20@1x.png
