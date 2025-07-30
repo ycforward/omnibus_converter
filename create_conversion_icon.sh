@@ -10,18 +10,15 @@ mkdir -p android_icons
 echo "📱 Generating iOS icons..."
 
 # 1024x1024 base icon with purple gradient and circular arrow
-# magick -size 1024x1024 xc:none \
-#   -define registry:temporary-path=. \
-#   -background none \
-#   \( -size 1024x1024 gradient:"#A179FF"-"#7038FF" -rotate 90 \) \
-#   -alpha on -compose over -composite \
-#   \( +clone -alpha extract -threshold 0 -negate -fill white -draw "roundrectangle 0,0 1023,1023 220,220" \) \
-#   -compose CopyOpacity -composite \
-#   \( -fill white -draw "circle 512,512 512,212" \) \
-#   \( -fill "#7038FF" -draw "circle 512,512 512,262" \) \
-#   \( -fill white -draw "path 'M512,212 A300,300 0 0 1 812,512 L780,500 L860,480 L820,560 L790,530 A300,300 0 0 1 512,812'" \) \
-#   -compose over -composite \
-#   ios_icons/Icon-App-1024x1024@1x.png
+magick -size 1024x1024 gradient:'#8b5cf6-#a855f7' \
+  -fill white -draw "circle 512,512 512,200" \
+  -fill '#8b5cf6' -draw "circle 512,512 512,180" \
+  -fill white -stroke '#8b5cf6' -strokewidth 20 -draw "circle 512,512 512,160" \
+  -fill '#8b5cf6' -draw "polygon 512,400 480,450 544,450" \
+  -fill '#8b5cf6' -draw "polygon 512,624 480,574 544,574" \
+  -fill '#8b5cf6' -draw "polygon 400,512 450,480 450,544" \
+  -fill '#8b5cf6' -draw "polygon 624,512 574,480 574,544" \
+  ios_icons/Icon-App-1024x1024@1x.png
 
 # Generate all iOS sizes
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 20x20 ios_icons/Icon-App-20x20@1x.png
