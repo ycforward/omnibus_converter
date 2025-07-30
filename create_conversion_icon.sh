@@ -1,26 +1,23 @@
 #!/bin/bash
 
-echo "🎨 Creating app icon with purple gradient and circular arrow design..."
+echo "🎨 Creating app icons from custom app_icon.png..."
 
 # Create output directories
 mkdir -p ios_icons
 mkdir -p android_icons
 
-# Create the exact icon design from the attached image
-echo "📱 Generating iOS icons..."
+# Check if the source icon exists
+if [ ! -f "app_icon.png" ]; then
+    echo "❌ Error: app_icon.png not found in the project root!"
+    exit 1
+fi
 
-# 1024x1024 base icon with purple gradient and circular arrow
-magick -size 1024x1024 gradient:'#8b5cf6-#a855f7' \
-  -fill white -draw "circle 512,512 512,200" \
-  -fill '#8b5cf6' -draw "circle 512,512 512,180" \
-  -fill white -stroke '#8b5cf6' -strokewidth 20 -draw "circle 512,512 512,160" \
-  -fill '#8b5cf6' -draw "polygon 512,400 480,450 544,450" \
-  -fill '#8b5cf6' -draw "polygon 512,624 480,574 544,574" \
-  -fill '#8b5cf6' -draw "polygon 400,512 450,480 450,544" \
-  -fill '#8b5cf6' -draw "polygon 624,512 574,480 574,544" \
-  ios_icons/Icon-App-1024x1024@1x.png
+echo "📱 Generating iOS icons from app_icon.png..."
 
-# Generate all iOS sizes
+# Copy the source icon as the 1024x1024 base icon
+cp app_icon.png ios_icons/Icon-App-1024x1024@1x.png
+
+# Generate all iOS sizes from the source icon
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 20x20 ios_icons/Icon-App-20x20@1x.png
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 40x40 ios_icons/Icon-App-20x20@2x.png
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 60x60 ios_icons/Icon-App-20x20@3x.png
@@ -37,14 +34,14 @@ magick ios_icons/Icon-App-1024x1024@1x.png -resize 152x152 ios_icons/Icon-App-76
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 167x167 ios_icons/Icon-App-83.5x83.5@2x.png
 
 # Android Icon Sizes
-echo "🤖 Generating Android icons..."
+echo "🤖 Generating Android icons from app_icon.png..."
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 48x48 android_icons/ic_launcher-mdpi.png
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 72x72 android_icons/ic_launcher-hdpi.png
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 96x96 android_icons/ic_launcher-xhdpi.png
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 144x144 android_icons/ic_launcher-xxhdpi.png
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 192x192 android_icons/ic_launcher-xxxhdpi.png
 
-echo "✅ All icons generated successfully!"
+echo "✅ All icons generated successfully from app_icon.png!"
 
 # Move iOS icons to the correct location
 echo "📱 Moving iOS icons to app location..."
