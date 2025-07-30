@@ -10,11 +10,17 @@ mkdir -p android_icons
 echo "📱 Generating iOS icons..."
 
 # 1024x1024 base icon with purple gradient and circular arrow
-# magick -size 1024x1024 xc:"#7B4DFF" \
-#   -fill white -draw "circle 512,512 512,300" \
-#   -fill '#7B4DFF' -draw "circle 512,512 512,350" \
-#   -fill white -draw "path 'M 512,300 A 212,212 0 0 1 700,512 L 670,500 L 740,480 L 720,560 L 700,530 A 212,212 0 0 1 512,724'" \
-#   -fill white -draw "path 'M 512,724 A 212,212 0 0 1 324,512 L 354,524 L 284,544 L 304,464 L 324,494 A 212,212 0 0 1 512,300'" \
+# magick -size 1024x1024 xc:none \
+#   -define registry:temporary-path=. \
+#   -background none \
+#   \( -size 1024x1024 gradient:"#A179FF"-"#7038FF" -rotate 90 \) \
+#   -alpha on -compose over -composite \
+#   \( +clone -alpha extract -threshold 0 -negate -fill white -draw "roundrectangle 0,0 1023,1023 220,220" \) \
+#   -compose CopyOpacity -composite \
+#   \( -fill white -draw "circle 512,512 512,212" \) \
+#   \( -fill "#7038FF" -draw "circle 512,512 512,262" \) \
+#   \( -fill white -draw "path 'M512,212 A300,300 0 0 1 812,512 L780,500 L860,480 L820,560 L790,530 A300,300 0 0 1 512,812'" \) \
+#   -compose over -composite \
 #   ios_icons/Icon-App-1024x1024@1x.png
 
 # Generate all iOS sizes
