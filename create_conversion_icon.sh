@@ -14,8 +14,8 @@ fi
 
 echo "📱 Generating iOS icons from app_icon.png..."
 
-# Resize the source icon to exactly 1024x1024 as the base icon
-magick app_icon.png -resize 1024x1024! ios_icons/Icon-App-1024x1024@1x.png
+# Resize the source icon to exactly 1024x1024 and remove alpha channel for App Store
+magick app_icon.png -resize 1024x1024! -background white -alpha remove -alpha off ios_icons/Icon-App-1024x1024@1x.png
 
 # Generate all iOS sizes from the source icon
 magick ios_icons/Icon-App-1024x1024@1x.png -resize 20x20 ios_icons/Icon-App-20x20@1x.png
