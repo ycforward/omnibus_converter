@@ -47,3 +47,17 @@ app.*.map.json
 
 # Local Netlify folder
 .netlify
+
+# Xcode build artifacts
+**/ios/Runner.xcarchive/
+**/ios/build/
+**/ios/DerivedData/
+**/ios/*.xcworkspace/xcuserdata/
+**/ios/*.xcodeproj/xcuserdata/
+**/ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Large files and build artifacts
+*.dSYM/
+**/dSYMs/
+*.ipa
+*.app
