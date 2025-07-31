@@ -41,6 +41,28 @@ A modern Flutter app for converting between different units of measurement.
 4. (Optional) Set up UniRateAPI for real currency rates (see [API_SETUP.md](API_SETUP.md))
 5. Run `flutter run` to start the app
 
+## Development Workflow
+
+### Prerequisites
+```bash
+# Install required tools
+brew install flutter imagemagick
+npm install -g netlify-cli
+```
+
+### Common Operations
+- **Generate App Icons**: `./create_conversion_icon.sh`
+- **Take App Store Screenshots**: `./app_store_screenshots/take_app_store_screenshots_flow.sh`
+- **Deploy Support Website**: `./deploy-netlify.sh`
+- **Run Tests**: `flutter test`
+
+For detailed instructions, see [HOWTO.md](HOWTO.md).
+
+### Automated Workflows
+- **Tests**: Run automatically on push/PR via GitHub Actions
+- **Website Deployment**: Auto-deploys to Netlify when `support_website/` changes
+- **App Store Release**: Manual process with Xcode Organizer
+
 ## Testing on iOS Devices & Simulators
 
 - **Recommended Device Coverage:**
@@ -129,6 +151,12 @@ bash take_app_store_screenshots_flow.sh "iPhone 16 Pro Max"
 - **Include multiple converter types** to demonstrate value
 
 For detailed guidance, see [APP_STORE_GUIDE.md](APP_STORE_GUIDE.md).
+
+## Platform Support
+
+- **iOS**: Primary target platform with full App Store support
+- **Android**: Secondary platform for Google Play Store
+- **Web**: Development/testing only (not for production)
 
 ## Future Enhancements
 
