@@ -64,8 +64,8 @@ void main() {
   group('Widget Tests', () {
     testWidgets('Length converter screen should load without overflow', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
         MaterialApp(
@@ -84,14 +84,14 @@ void main() {
       expect(find.byType(CalculatorInput), findsOneWidget);
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
   });
 
     testWidgets('Currency converter screen should load without errors', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-    tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       
@@ -112,14 +112,14 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
     
     testWidgets('ESC key should close currency dropdown', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       
@@ -139,14 +139,14 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
     
     testWidgets('Starring currency in one dropdown should update the other', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       
@@ -166,14 +166,14 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
     
     testWidgets('Starred currencies should persist across widget rebuilds', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       
@@ -193,14 +193,14 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
     
     testWidgets('Search functionality should work with starred currencies', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       
@@ -220,16 +220,16 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
   });
 
   group('Session Memory Tests', () {
     testWidgets('Currency converter should remember last used currencies within session', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       SessionMemoryService.clearSession();
@@ -250,14 +250,14 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
 
     testWidgets('Currency converter should start with value "1" by default', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       SessionMemoryService.clearSession();
@@ -278,14 +278,14 @@ void main() {
       expect(find.text('1'), findsAtLeastNWidgets(1));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
     
     testWidgets('Dropdown should be scrollable', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       
@@ -305,14 +305,14 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
 
     testWidgets('Session memory should persist source value changes', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       SessionMemoryService.clearSession();
@@ -333,14 +333,14 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
     
     testWidgets('Dropdown should have no padding at top', (WidgetTester tester) async {
       // Set up with proper screen size
-      tester.binding.window.physicalSizeTestValue = const Size(800, 1200);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
       
       await CurrencyPreferencesService.initialize();
       
@@ -360,8 +360,8 @@ void main() {
       expect(find.byType(InkWell), findsAtLeastNWidgets(2));
       
       // Reset window size
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
   });
 
