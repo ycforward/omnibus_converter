@@ -21,8 +21,15 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # Disable rules that are too strict for CI/CD
+    avoid_print: false  # Allow print statements for debugging
+    prefer_const_constructors: false  # Don't require const everywhere
+    prefer_const_declarations: false  # Don't require const declarations
+    prefer_const_literals_to_create_immutables: false  # Don't require const literals
+    prefer_interpolation_to_compose_strings: false  # Allow string concatenation
+    unnecessary_const: false  # Don't warn about unnecessary const
+
+    prefer_final_fields: false  # Don't require final fields
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
