@@ -577,7 +577,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
     // Responsive padding and spacing
     final horizontalPadding = isLargeScreen ? 32.0 : 16.0;
     final verticalPadding = isLargeScreen ? 24.0 : 16.0;
-    final containerHeight = isLargeScreen ? 140.0 : 120.0;
+    final containerHeight = isLargeScreen ? 160.0 : 120.0; // Increased height for iPad
     final borderRadius = isLargeScreen ? 16.0 : 12.0;
     
     return Scaffold(
@@ -887,13 +887,17 @@ class _ConverterScreenState extends State<ConverterScreen> {
                 ),
               ),
               
-              // Calculator input - Third row
+              // Calculator input - Fourth row
               Expanded(
-                child: CalculatorInput(
-                  onExpressionEvaluated: _convertLive,
-                  onExpressionChanged: _onCalculatorChanged,
-                  initialValue: _sourceValue,
-                  hideExpression: true,
+                child: Container(
+                  // Add bottom padding for iPad to prevent cutoff
+                  padding: EdgeInsets.only(bottom: isLargeScreen ? 20.0 : 0.0),
+                  child: CalculatorInput(
+                    onExpressionEvaluated: _convertLive,
+                    onExpressionChanged: _onCalculatorChanged,
+                    initialValue: _sourceValue,
+                    hideExpression: true,
+                  ),
                 ),
               ),
             ],

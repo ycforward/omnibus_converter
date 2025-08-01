@@ -140,13 +140,13 @@ class CalculatorInputState extends State<CalculatorInput> {
     final screenSize = MediaQuery.of(context).size;
     final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
     
-    // Responsive sizing
-    final buttonPadding = isLargeScreen ? 12.0 : 8.0;
-    final buttonFontSize = isLargeScreen ? fontSize + 4 : fontSize;
-    final borderRadius = isLargeScreen ? 20.0 : 16.0;
+    // Responsive sizing - larger buttons for iPad
+    final buttonPadding = isLargeScreen ? 16.0 : 8.0;
+    final buttonFontSize = isLargeScreen ? fontSize + 6 : fontSize;
+    final borderRadius = isLargeScreen ? 24.0 : 16.0;
     
     return Padding(
-      padding: EdgeInsets.all(isLargeScreen ? 6.0 : 4.0),
+      padding: EdgeInsets.all(isLargeScreen ? 8.0 : 4.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
