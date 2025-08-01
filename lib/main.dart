@@ -32,9 +32,12 @@ void main() async {
     dotenv.env['UNIRATE_BASE_URL'] = 'https://api.unirateapi.com/api';
   }
   
+  // Allow both portrait and landscape for iPad, portrait only for iPhone
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
   ]);
   
   // Initialize currency preferences and preload exchange rates in background
@@ -74,7 +77,25 @@ class ConverterApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const HomeScreen(),
+      home: const AdaptiveHomeScreen(),
     );
+  }
+}
+
+class AdaptiveHomeScreen extends StatelessWidget {
+  const AdaptiveHomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isTablet = screenSize.width > 600 || screenSize.height > 600;
+    
+    if (isTablet) {
+      // iPad native layout
+      return const TabletHomeScreen();
+    } else {
+      // iPhone layout
+      return const HomeScreen();
+    }
   }
 }

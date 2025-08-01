@@ -154,4 +154,247 @@ class _ConverterCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class TabletHomeScreen extends StatefulWidget {
+  const TabletHomeScreen({super.key});
+
+  @override
+  State<TabletHomeScreen> createState() => _TabletHomeScreenState();
+}
+
+class _TabletHomeScreenState extends State<TabletHomeScreen> {
+  int _selectedIndex = 0;
+  ConverterType? _selectedConverter;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isLandscape = screenSize.width > screenSize.height;
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Unit Converter'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        elevation: 0,
+      ),
+      body: Row(
+        children: [
+          // Sidebar with converter categories
+          Container(
+            width: isLandscape ? 300 : 250,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              border: Border(
+                right: BorderSide(
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Column(
+              children: [
+                // Navigation tabs
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildNavTab(0, Icons.calculate, 'Converters'),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildNavTab(1, Icons.favorite, 'Favorites', color: Colors.red),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                // Content based on selected tab
+                Expanded(
+                  child: _selectedIndex == 0 
+                      ? _buildConvertersList()
+                      : const FavoritesScreen(),
+                ),
+              ],
+            ),
+          ),
+          // Main content area
+          Expanded(
+            child: _selectedConverter != null
+                ? ConverterScreen(converterType: _selectedConverter!)
+                : _buildWelcomeScreen(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavTab(int index, IconData icon, String label, {Color? color}) {
+    final isSelected = _selectedIndex == index;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+          if (index == 1) {
+            _selectedConverter = null; // Clear converter when switching to favorites
+          }
+        });
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected 
+                  ? Theme.of(context).colorScheme.onPrimaryContainer
+                  : color ?? Theme.of(context).colorScheme.onSurface,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected 
+                    ? Theme.of(context).colorScheme.onPrimaryContainer
+                    : color ?? Theme.of(context).colorScheme.onSurface,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConvertersList() {
+    final sortedTypes = List<ConverterType>.from(ConverterType.values)
+      ..sort((a, b) => a.title.compareTo(b.title));
+    
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: sortedTypes.length,
+      itemBuilder: (context, index) {
+        final converterType = sortedTypes[index];
+        final isSelected = _selectedConverter == converterType;
+        
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          elevation: isSelected ? 4 : 2,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                _selectedConverter = converterType;
+              });
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: isSelected 
+                    ? Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      )
+                    : null,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSelected 
+                          ? Theme.of(context).colorScheme.primaryContainer
+                          : Theme.of(context).colorScheme.surfaceVariant,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      converterType.icon,
+                      size: 32,
+                      color: isSelected 
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          converterType.title,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: isSelected 
+                                ? Theme.of(context).colorScheme.primary
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          converterType.description,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isSelected)
+                    Icon(
+                      Icons.check_circle,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 24,
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildWelcomeScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.calculate_outlined,
+            size: 80,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Select a Converter',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Choose a converter from the sidebar to get started',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
 } 
