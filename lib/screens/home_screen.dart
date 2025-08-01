@@ -125,6 +125,7 @@ class _ConverterCard extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: cardPadding, horizontal: cardPadding),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 converterType.icon,
@@ -132,24 +133,28 @@ class _ConverterCard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
               SizedBox(height: spacing),
-              Text(
-                converterType.title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: titleFontSize,
+              Flexible(
+                child: Text(
+                  converterType.title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: titleFontSize,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
               SizedBox(height: smallSpacing),
-              Text(
-                converterType.description,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: descriptionFontSize,
+              Flexible(
+                child: Text(
+                  converterType.description,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: descriptionFontSize,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
