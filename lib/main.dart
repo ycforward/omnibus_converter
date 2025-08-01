@@ -32,9 +32,12 @@ void main() async {
     dotenv.env['UNIRATE_BASE_URL'] = 'https://api.unirateapi.com/api';
   }
   
+  // Allow both portrait and landscape for better iPad support
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
   ]);
   
   // Initialize currency preferences and preload exchange rates in background

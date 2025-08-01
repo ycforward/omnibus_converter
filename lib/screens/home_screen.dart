@@ -49,9 +49,12 @@ class _ConvertersTab extends StatelessWidget {
     // Get screen dimensions for responsive design
     final screenSize = MediaQuery.of(context).size;
     final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
+    final isLandscape = screenSize.width > screenSize.height;
     
-    // Responsive grid layout
-    final crossAxisCount = isLargeScreen ? 3 : 2;
+    // Responsive grid layout - 4 columns for iPad landscape, 3 for iPad portrait, 2 for iPhone
+    final crossAxisCount = isLargeScreen 
+        ? (isLandscape ? 4 : 3) 
+        : 2;
     final crossAxisSpacing = isLargeScreen ? 24.0 : 16.0;
     final mainAxisSpacing = isLargeScreen ? 24.0 : 16.0;
     final childAspectRatio = isLargeScreen ? 1.1 : 0.95;
