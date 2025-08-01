@@ -438,23 +438,29 @@ class _ConverterScreenState extends State<ConverterScreen> {
     final String currentUnit = isSource ? _fromUnit : _toUnit;
     final String label = isSource ? 'From' : 'To';
 
+    // Get screen dimensions for responsive design
+    final screenSize = MediaQuery.of(context).size;
+    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(isLargeScreen ? 24.0 : 20.0)),
       ),
       builder: (BuildContext context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          padding: const EdgeInsets.all(16),
+          height: MediaQuery.of(context).size.height * (isLargeScreen ? 0.6 : 0.7),
+          padding: EdgeInsets.all(isLargeScreen ? 24.0 : 16.0),
           child: Column(
             children: [
               Text(
                 'Select $label Unit',
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontSize: isLargeScreen ? 24.0 : null,
+                ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: isLargeScreen ? 24.0 : 16.0),
               Expanded(
                 child: widget.converterType == ConverterType.currency
                     ? _CurrencyListWidget(
@@ -564,6 +570,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for responsive design
+    final screenSize = MediaQuery.of(context).size;
+    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
+    
+    // Responsive padding and spacing
+    final horizontalPadding = isLargeScreen ? 32.0 : 16.0;
+    final verticalPadding = isLargeScreen ? 24.0 : 16.0;
+    final containerHeight = isLargeScreen ? 140.0 : 120.0;
+    final borderRadius = isLargeScreen ? 16.0 : 12.0;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.converterType.title),
@@ -594,17 +610,17 @@ class _ConverterScreenState extends State<ConverterScreen> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Source value box with integrated unit selector - First row
               Container(
-                height: 120, // Increased height to accommodate unit selector
-                margin: const EdgeInsets.only(bottom: 16),
+                height: containerHeight, // Responsive height
+                margin: EdgeInsets.only(bottom: isLargeScreen ? 24.0 : 16.0),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(borderRadius),
                         border: Border.all(
                           color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
                         ),
@@ -615,18 +631,18 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     // Unit selector as clickable header (unit name only)
                     InkWell(
                       onTap: () => _showUnitSelector(true), // true for source unit
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(borderRadius),
+                        topRight: Radius.circular(borderRadius),
                       ),
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(12),
+                        padding: EdgeInsets.all(isLargeScreen ? 16.0 : 12.0),
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.primary.withOpacity(0.13), // slightly more contrast
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(borderRadius),
+                            topRight: Radius.circular(borderRadius),
                           ),
                           border: Border.all(
                             color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
@@ -641,6 +657,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.w600,
+                                fontSize: isLargeScreen ? 18.0 : null,
                               ),
                           ),
                             const Icon(
@@ -656,7 +673,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     Expanded(
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(isLargeScreen ? 20.0 : 16.0),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Row(
@@ -669,17 +686,21 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     fontWeight: FontWeight.normal,
+                                    fontSize: isLargeScreen ? 22.0 : null,
                                   ),
                                 ),
                                 Expanded(
                                   child: Text(
                                     _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
                                     key: const Key('converter_input'),
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: isLargeScreen ? 22.0 : null,
+                            ),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
-                      ),
-                    ),
+                                  ),
+                                ),
                               ] else ...[
                                 // For other units: value first, then abbreviation (positioned next to value)
                                 Flexible(
@@ -692,6 +713,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).colorScheme.onSurface,
+                                            fontSize: isLargeScreen ? 22.0 : null,
                                           ),
                                         ),
                                         TextSpan(
@@ -699,6 +721,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                                             fontWeight: FontWeight.normal,
+                                            fontSize: isLargeScreen ? 22.0 : null,
                                           ),
                                         ),
                                       ],
@@ -716,49 +739,51 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   ],
                 ),
               ),
+              
               // Vertical swap button - Second row
               Container(
-                margin: const EdgeInsets.only(bottom: 16),
+                margin: EdgeInsets.only(bottom: isLargeScreen ? 24.0 : 16.0),
                 child: Center(
                   child: IconButton(
                     onPressed: _swapUnits,
                     icon: const Icon(Icons.swap_vert), // Changed to vertical
                     style: IconButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(isLargeScreen ? 16.0 : 12.0),
                     ),
                   ),
                 ),
               ),
-              // Target value box with integrated unit selector - Third row
+              
+              // Result value box with integrated unit selector - Third row
               Container(
-                height: 120, // Increased height to accommodate unit selector
-                margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                        ),
-                      ),
-                      child: Column(
+                height: containerHeight, // Responsive height
+                margin: EdgeInsets.only(bottom: isLargeScreen ? 24.0 : 16.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  ),
+                ),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
+                  children: [
                     // Unit selector as clickable header (unit name only)
                     InkWell(
                       onTap: () => _showUnitSelector(false), // false for target unit
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(borderRadius),
+                        topRight: Radius.circular(borderRadius),
                       ),
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(12),
+                        padding: EdgeInsets.all(isLargeScreen ? 16.0 : 12.0),
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.secondary.withOpacity(0.13), // slightly more contrast
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(borderRadius),
+                            topRight: Radius.circular(borderRadius),
                           ),
                           border: Border.all(
                             color: Theme.of(context).colorScheme.secondary.withOpacity(0.25),
@@ -773,6 +798,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.secondary,
                                 fontWeight: FontWeight.w600,
+                                fontSize: isLargeScreen ? 18.0 : null,
                               ),
                           ),
                             const Icon(
@@ -788,7 +814,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     Expanded(
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(isLargeScreen ? 20.0 : 16.0),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: _isLoading
@@ -807,13 +833,17 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                                           fontWeight: FontWeight.normal,
+                                          fontSize: isLargeScreen ? 22.0 : null,
                                         ),
                                       ),
                                       Expanded(
                                         child: Text(
                                           _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
                                           key: const Key('converter_result'),
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isLargeScreen ? 22.0 : null,
+                                  ),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
                                         ),
@@ -830,6 +860,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                   fontWeight: FontWeight.bold,
                                                   color: Theme.of(context).colorScheme.onSurface,
+                                                  fontSize: isLargeScreen ? 22.0 : null,
                                                 ),
                                               ),
                                               TextSpan(
@@ -837,6 +868,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                                                   fontWeight: FontWeight.normal,
+                                                  fontSize: isLargeScreen ? 22.0 : null,
                                                 ),
                   ),
                 ],
@@ -854,19 +886,16 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   ],
                 ),
               ),
-              // Calculator section fills remaining space - removed expression box
+              
+              // Calculator input - Third row
               Expanded(
                 child: CalculatorInput(
+                  onExpressionEvaluated: _convertLive,
+                  onExpressionChanged: _onCalculatorChanged,
                   initialValue: _sourceValue,
-                  onExpressionEvaluated: (value) {
-                    _onCalculatorChanged(value);
-                  },
-                  onExpressionChanged: (value) {
-                    _onCalculatorChanged(value);
-                  },
-                  hideExpression: true, // Hide the expression box
-                          ),
-                        ),
+                  hideExpression: true,
+                ),
+              ),
             ],
           ),
         ),

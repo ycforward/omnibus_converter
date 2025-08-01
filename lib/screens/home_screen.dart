@@ -46,19 +46,31 @@ class _ConvertersTab extends StatelessWidget {
     final sortedTypes = List<ConverterType>.from(ConverterType.values)
       ..sort((a, b) => a.title.compareTo(b.title));
     
+    // Get screen dimensions for responsive design
+    final screenSize = MediaQuery.of(context).size;
+    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
+    
+    // Responsive grid layout
+    final crossAxisCount = isLargeScreen ? 3 : 2;
+    final crossAxisSpacing = isLargeScreen ? 24.0 : 16.0;
+    final mainAxisSpacing = isLargeScreen ? 24.0 : 16.0;
+    final childAspectRatio = isLargeScreen ? 1.1 : 0.95;
+    final horizontalPadding = isLargeScreen ? 32.0 : 16.0;
+    final verticalPadding = isLargeScreen ? 24.0 : 16.0;
+    
     return Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 24),
+            SizedBox(height: isLargeScreen ? 32.0 : 24.0),
             Expanded(
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.95,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: crossAxisSpacing,
+                  mainAxisSpacing: mainAxisSpacing,
+                  childAspectRatio: childAspectRatio,
                 ),
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: sortedTypes.length,
@@ -81,6 +93,18 @@ class _ConverterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for responsive design
+    final screenSize = MediaQuery.of(context).size;
+    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
+    
+    // Responsive card styling
+    final cardPadding = isLargeScreen ? 20.0 : 16.0;
+    final iconSize = isLargeScreen ? 56.0 : 48.0;
+    final titleFontSize = isLargeScreen ? 18.0 : null;
+    final descriptionFontSize = isLargeScreen ? 14.0 : null;
+    final spacing = isLargeScreen ? 16.0 : 12.0;
+    final smallSpacing = isLargeScreen ? 8.0 : 4.0;
+    
     return Card(
       elevation: 4,
       child: InkWell(
@@ -95,28 +119,30 @@ class _ConverterCard extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          padding: EdgeInsets.symmetric(vertical: cardPadding, horizontal: cardPadding),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 converterType.icon,
-                size: 48,
+                size: iconSize,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: spacing),
               Text(
                 converterType.title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
+                  fontSize: titleFontSize,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: smallSpacing),
               Text(
                 converterType.description,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: descriptionFontSize,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,
