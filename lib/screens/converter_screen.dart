@@ -855,7 +855,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       ),
                       child: IconButton(
                         onPressed: _swapUnits,
-                        icon: const Icon(Icons.swap_vert, size: 20, color: Colors.white),
+                        icon: const Icon(Icons.swap_vert, size: 20, color: Colors.black),
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.white,
                           padding: const EdgeInsets.all(8), // Smaller padding
