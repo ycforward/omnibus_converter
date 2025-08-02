@@ -641,7 +641,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   ),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
                                       _getUnitFullName(_fromUnit),
@@ -649,11 +649,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                         color: Theme.of(context).colorScheme.primary,
                                         fontWeight: FontWeight.w600,
                                       ),
-                                    ),
-                                    const Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      color: Colors.black38,
-                                      size: 28,
                                     ),
                                   ],
                                 ),
@@ -760,7 +755,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   ),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
                                       _getUnitFullName(_toUnit),
@@ -768,11 +763,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                         color: Theme.of(context).colorScheme.secondary,
                                         fontWeight: FontWeight.w600,
                                       ),
-                                    ),
-                                    const Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      color: Colors.black38,
-                                      size: 28,
                                     ),
                                   ],
                                 ),
@@ -865,9 +855,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       ),
                       child: IconButton(
                         onPressed: _swapUnits,
-                        icon: const Icon(Icons.swap_vert, size: 20),
+                        icon: const Icon(Icons.swap_vert, size: 20, color: Colors.white),
                         style: IconButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          backgroundColor: Colors.white,
                           padding: const EdgeInsets.all(8), // Smaller padding
                           minimumSize: const Size(32, 32), // Smaller minimum size
                         ),
