@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
                 text: 'Converters',
               ),
               Tab(
-                icon: Icon(Icons.favorite, color: Colors.red),
+                icon: Icon(Icons.favorite, color: AppColors.favorite),
                 text: 'Favorites',
               ),
             ],

@@ -414,18 +414,18 @@ void main() {
   });
 
   group('UI Layout Tests', () {
-    testWidgets('Favorites tab heart icon is red', (WidgetTester tester) async {
+    testWidgets('Favorites tab heart icon is white', (WidgetTester tester) async {
       await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
       // Find the TabBar
       final tabBar = find.byType(TabBar);
       expect(tabBar, findsOneWidget);
-      // Find the red heart icon
-      final redHeart = find.widgetWithIcon(Tab, Icons.favorite).evaluate().where((e) {
+      // Find the white heart icon
+      final whiteHeart = find.widgetWithIcon(Tab, Icons.favorite).evaluate().where((e) {
         final icon = e.widget as Tab;
         final iconWidget = icon.icon as Icon;
-        return iconWidget.color == Colors.red;
+        return iconWidget.color == Colors.white;
       });
-      expect(redHeart.length, 1);
+      expect(whiteHeart.length, 1);
     });
   });
 }

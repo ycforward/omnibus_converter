@@ -13,4 +13,7 @@ class AppColors {
   
   /// Black color for contrast against white backgrounds
   static const Color black = Colors.black;
+  
+  /// Favorite color - white for better contrast against purple
+  static const Color favorite = Colors.white;
 } 

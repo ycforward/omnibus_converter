@@ -745,7 +745,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
             onPressed: _toggleFavorite,
             icon: Icon(
               _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite ? Colors.red : null,
+              color: _isFavorite ? AppColors.favorite : null,
             ),
             tooltip: _isFavorite ? 'Remove from favorites' : 'Add to favorites',
           ),
@@ -789,13 +789,13 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.13),
+                                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.13),
                                   borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(12),
                                     topRight: Radius.circular(12),
                                   ),
                                   border: Border.all(
-                                    color: AppColors.primary.withOpacity(0.25),
+                                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.25),
                                     width: 1.2,
                                   ),
                                 ),
@@ -805,7 +805,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                     Text(
                                       _getUnitFullName(_fromUnit),
                                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                        color: AppColors.primary,
+                                        color: Theme.of(context).colorScheme.secondary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
