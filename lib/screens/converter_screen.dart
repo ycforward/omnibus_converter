@@ -9,6 +9,7 @@ import '../services/currency_preferences_service.dart';
 import '../widgets/unit_selector.dart';
 import '../widgets/searchable_currency_selector.dart';
 import '../widgets/calculator_input.dart';
+import '../constants/app_colors.dart';
 
 class ConverterScreen extends StatefulWidget {
   final ConverterType converterType;
@@ -433,6 +434,163 @@ class _ConverterScreenState extends State<ConverterScreen> {
     }
   }
 
+  // Helper to get full currency name
+  String _getCurrencyFullName(String currencyCode) {
+    switch (currencyCode) {
+      case 'USD': return 'US Dollar';
+      case 'EUR': return 'Euro';
+      case 'GBP': return 'British Pound';
+      case 'JPY': return 'Japanese Yen';
+      case 'CNY': return 'Chinese Yuan';
+      case 'AUD': return 'Australian Dollar';
+      case 'CAD': return 'Canadian Dollar';
+      case 'CHF': return 'Swiss Franc';
+      case 'NZD': return 'New Zealand Dollar';
+      case 'SEK': return 'Swedish Krona';
+      case 'NOK': return 'Norwegian Krone';
+      case 'DKK': return 'Danish Krone';
+      case 'PLN': return 'Polish Zloty';
+      case 'CZK': return 'Czech Koruna';
+      case 'HUF': return 'Hungarian Forint';
+      case 'RUB': return 'Russian Ruble';
+      case 'TRY': return 'Turkish Lira';
+      case 'BRL': return 'Brazilian Real';
+      case 'MXN': return 'Mexican Peso';
+      case 'INR': return 'Indian Rupee';
+      case 'KRW': return 'South Korean Won';
+      case 'SGD': return 'Singapore Dollar';
+      case 'HKD': return 'Hong Kong Dollar';
+      case 'TWD': return 'Taiwan Dollar';
+      case 'THB': return 'Thai Baht';
+      case 'MYR': return 'Malaysian Ringgit';
+      case 'IDR': return 'Indonesian Rupiah';
+      case 'PHP': return 'Philippine Peso';
+      case 'VND': return 'Vietnamese Dong';
+      case 'ZAR': return 'South African Rand';
+      case 'EGP': return 'Egyptian Pound';
+      case 'NGN': return 'Nigerian Naira';
+      case 'KES': return 'Kenyan Shilling';
+      case 'GHS': return 'Ghanaian Cedi';
+      case 'UGX': return 'Ugandan Shilling';
+      case 'TZS': return 'Tanzanian Shilling';
+      case 'MAD': return 'Moroccan Dirham';
+      case 'DZD': return 'Algerian Dinar';
+      case 'TND': return 'Tunisian Dinar';
+      case 'LYD': return 'Libyan Dinar';
+      case 'SDG': return 'Sudanese Pound';
+      case 'ETB': return 'Ethiopian Birr';
+      case 'SOS': return 'Somali Shilling';
+      case 'DJF': return 'Djiboutian Franc';
+      case 'KMF': return 'Comorian Franc';
+      case 'MUR': return 'Mauritian Rupee';
+      case 'SCR': return 'Seychellois Rupee';
+      case 'BIF': return 'Burundian Franc';
+      case 'RWF': return 'Rwandan Franc';
+      case 'MWK': return 'Malawian Kwacha';
+      case 'ZMW': return 'Zambian Kwacha';
+      case 'ZWL': return 'Zimbabwean Dollar';
+      case 'BWP': return 'Botswana Pula';
+      case 'NAD': return 'Namibian Dollar';
+      case 'LSL': return 'Lesotho Loti';
+      case 'SZL': return 'Eswatini Lilangeni';
+      case 'MZN': return 'Mozambican Metical';
+      case 'MGA': return 'Malagasy Ariary';
+      case 'CDF': return 'Congolese Franc';
+      case 'XAF': return 'Central African CFA Franc';
+      case 'XOF': return 'West African CFA Franc';
+      case 'XPF': return 'CFP Franc';
+      case 'CLP': return 'Chilean Peso';
+      case 'COP': return 'Colombian Peso';
+      case 'PEN': return 'Peruvian Sol';
+      case 'ARS': return 'Argentine Peso';
+      case 'UYU': return 'Uruguayan Peso';
+      case 'PYG': return 'Paraguayan Guarani';
+      case 'BOB': return 'Bolivian Boliviano';
+      case 'GTQ': return 'Guatemalan Quetzal';
+      case 'HNL': return 'Honduran Lempira';
+      case 'NIO': return 'Nicaraguan Cordoba';
+      case 'CRC': return 'Costa Rican Colon';
+      case 'PAB': return 'Panamanian Balboa';
+      case 'DOP': return 'Dominican Peso';
+      case 'JMD': return 'Jamaican Dollar';
+      case 'TTD': return 'Trinidad and Tobago Dollar';
+      case 'BBD': return 'Barbadian Dollar';
+      case 'XCD': return 'East Caribbean Dollar';
+      case 'AWG': return 'Aruban Florin';
+      case 'ANG': return 'Netherlands Antillean Guilder';
+      case 'GYD': return 'Guyanese Dollar';
+      case 'SRD': return 'Surinamese Dollar';
+      case 'BZD': return 'Belize Dollar';
+      case 'BMD': return 'Bermudian Dollar';
+      case 'KYD': return 'Cayman Islands Dollar';
+      case 'FJD': return 'Fijian Dollar';
+      case 'WST': return 'Samoan Tala';
+      case 'TOP': return 'Tongan Pa\'anga';
+      case 'VUV': return 'Vanuatu Vatu';
+      case 'SBD': return 'Solomon Islands Dollar';
+      case 'PGK': return 'Papua New Guinean Kina';
+      case 'KID': return 'Kiribati Dollar';
+      case 'TVD': return 'Tuvaluan Dollar';
+      case 'LAK': return 'Lao Kip';
+      case 'KHR': return 'Cambodian Riel';
+      case 'MMK': return 'Myanmar Kyat';
+      case 'BDT': return 'Bangladeshi Taka';
+      case 'LKR': return 'Sri Lankan Rupee';
+      case 'NPR': return 'Nepalese Rupee';
+      case 'BTN': return 'Bhutanese Ngultrum';
+      case 'MVR': return 'Maldivian Rufiyaa';
+      case 'PKR': return 'Pakistani Rupee';
+      case 'AFN': return 'Afghan Afghani';
+      case 'IRR': return 'Iranian Rial';
+      case 'IQD': return 'Iraqi Dinar';
+      case 'JOD': return 'Jordanian Dinar';
+      case 'LBP': return 'Lebanese Pound';
+      case 'SYP': return 'Syrian Pound';
+      case 'ILS': return 'Israeli Shekel';
+      case 'PAL': return 'Palestinian Pound';
+      case 'QAR': return 'Qatari Riyal';
+      case 'SAR': return 'Saudi Riyal';
+      case 'AED': return 'UAE Dirham';
+      case 'OMR': return 'Omani Rial';
+      case 'YER': return 'Yemeni Rial';
+      case 'KWD': return 'Kuwaiti Dinar';
+      case 'BHD': return 'Bahraini Dinar';
+      case 'KZT': return 'Kazakhstani Tenge';
+      case 'KGS': return 'Kyrgyzstani Som';
+      case 'TJS': return 'Tajikistani Somoni';
+      case 'UZS': return 'Uzbekistani Som';
+      case 'TMT': return 'Turkmenistani Manat';
+      case 'AZN': return 'Azerbaijani Manat';
+      case 'GEL': return 'Georgian Lari';
+      case 'AMD': return 'Armenian Dram';
+      case 'BYN': return 'Belarusian Ruble';
+      case 'MDL': return 'Moldovan Leu';
+      case 'UAH': return 'Ukrainian Hryvnia';
+      case 'GMD': return 'Gambian Dalasi';
+      case 'GNF': return 'Guinean Franc';
+      case 'SLL': return 'Sierra Leonean Leone';
+      case 'LRD': return 'Liberian Dollar';
+      case 'CVE': return 'Cape Verdean Escudo';
+      case 'STN': return 'Sao Tome and Principe Dobra';
+      case 'GIP': return 'Gibraltar Pound';
+      case 'FKP': return 'Falkland Islands Pound';
+      case 'SHP': return 'Saint Helena Pound';
+      case 'IMP': return 'Isle of Man Pound';
+      case 'JEP': return 'Jersey Pound';
+      case 'GGP': return 'Guernsey Pound';
+      case 'AOA': return 'Angolan Kwanza';
+      case 'CLF': return 'Chilean Unit of Account';
+      case 'COU': return 'Colombian Real Value Unit';
+      case 'UYI': return 'Uruguay Peso en Unidades Indexadas';
+      case 'BOV': return 'Bolivian Mvdol';
+      case 'MXV': return 'Mexican Unidad de Inversion';
+      case 'USN': return 'US Dollar (Next day)';
+      case 'USS': return 'US Dollar (Same day)';
+      case 'XXX': return 'Unknown Currency';
+      default: return currencyCode;
+    }
+  }
+
   void _showUnitSelector(bool isSource) {
     final List<String> units = _conversionService.getUnits(widget.converterType);
     final String currentUnit = isSource ? _fromUnit : _toUnit;
@@ -504,7 +662,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
   // Helper to get full unit name for all types
   String _getUnitFullName(String unit) {
     if (widget.converterType == ConverterType.currency) {
-      return unit;
+      return _getCurrencyFullName(unit);
     }
     // For other types, show the full unit name (e.g., Meter, Foot)
     // If abbreviation is present, show only the full name
@@ -567,7 +725,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.converterType.title),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  backgroundColor: AppColors.primary, // Use centralized color
+          foregroundColor: AppColors.white, // White text for contrast
         actions: [
           // Refresh button for currency conversions
           if (widget.converterType == ConverterType.currency)
@@ -608,13 +767,13 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       Container(
                         height: 120,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          color: AppColors.primary.withOpacity(0.1),
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12),
                           ),
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                            color: AppColors.primary.withOpacity(0.3),
                           ),
                         ),
                         child: Column(
@@ -630,13 +789,13 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.13),
+                                  color: AppColors.primary.withOpacity(0.13),
                                   borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(12),
                                     topRight: Radius.circular(12),
                                   ),
                                   border: Border.all(
-                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                                    color: AppColors.primary.withOpacity(0.25),
                                     width: 1.2,
                                   ),
                                 ),
@@ -646,7 +805,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                     Text(
                                       _getUnitFullName(_fromUnit),
                                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                        color: Theme.of(context).colorScheme.primary,
+                                        color: AppColors.primary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -720,7 +879,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         height: 120,
                         margin: const EdgeInsets.only(top: 0),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: AppColors.primary.withOpacity(0.15),
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12),
@@ -728,7 +887,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                             bottomRight: Radius.circular(12),
                           ),
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                            color: AppColors.primary.withOpacity(0.4),
                           ),
                         ),
                         child: Column(

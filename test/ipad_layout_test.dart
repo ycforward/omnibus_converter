@@ -81,8 +81,8 @@ void main() {
       expect(find.byType(Stack), findsAtLeastNWidgets(1));
       
       // Verify both currency boxes are present
-      expect(find.text('USD'), findsOneWidget);
-      expect(find.text('CNY'), findsOneWidget);
+      expect(find.text('US Dollar'), findsOneWidget);
+      expect(find.text('Chinese Yuan'), findsOneWidget);
     });
 
     testWidgets('Layout should work on different iPad orientations', (WidgetTester tester) async {
@@ -126,8 +126,8 @@ void main() {
       expect(find.byType(Stack), findsAtLeastNWidgets(1));
       
       // Verify both currency boxes are present
-      expect(find.text('USD'), findsOneWidget);
-      expect(find.text('CNY'), findsOneWidget);
+      expect(find.text('US Dollar'), findsOneWidget);
+      expect(find.text('Chinese Yuan'), findsOneWidget);
     });
   });
 } 

@@ -1,6 +1,7 @@
 import 'converter_screen.dart';
 import 'favorites_screen.dart';
 import '../models/converter_type.dart';
+import '../constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -13,8 +14,12 @@ class HomeScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Unit Converter'),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: AppColors.primary, // Use centralized color
+          foregroundColor: AppColors.white, // White text for contrast
           bottom: TabBar(
+            labelColor: AppColors.white, // White text for selected tab
+            unselectedLabelColor: AppColors.white.withOpacity(0.7), // Slightly transparent white for unselected
+            indicatorColor: AppColors.white, // White indicator line
             tabs: [
               const Tab(
                 icon: Icon(Icons.calculate),
