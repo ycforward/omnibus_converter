@@ -438,29 +438,23 @@ class _ConverterScreenState extends State<ConverterScreen> {
     final String currentUnit = isSource ? _fromUnit : _toUnit;
     final String label = isSource ? 'From' : 'To';
 
-    // Get screen dimensions for responsive design
-    final screenSize = MediaQuery.of(context).size;
-    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
-    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(isLargeScreen ? 24.0 : 20.0)),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
         return Container(
-          height: MediaQuery.of(context).size.height * (isLargeScreen ? 0.6 : 0.7),
-          padding: EdgeInsets.all(isLargeScreen ? 24.0 : 16.0),
+          height: MediaQuery.of(context).size.height * 0.7,
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               Text(
                 'Select $label Unit',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontSize: isLargeScreen ? 24.0 : null,
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              SizedBox(height: isLargeScreen ? 24.0 : 16.0),
+              const SizedBox(height: 16),
               Expanded(
                 child: widget.converterType == ConverterType.currency
                     ? _CurrencyListWidget(
@@ -570,16 +564,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen dimensions for responsive design
-    final screenSize = MediaQuery.of(context).size;
-    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
-    
-    // Responsive padding and spacing
-    final horizontalPadding = isLargeScreen ? 32.0 : 16.0;
-    final verticalPadding = isLargeScreen ? 24.0 : 16.0;
-    final containerHeight = isLargeScreen ? 160.0 : 120.0; // Increased height for iPad
-    final borderRadius = isLargeScreen ? 16.0 : 12.0;
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.converterType.title),
@@ -610,296 +594,301 @@ class _ConverterScreenState extends State<ConverterScreen> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Source value box with integrated unit selector - First row
-              Container(
-                height: containerHeight, // Responsive height
-                margin: EdgeInsets.only(bottom: isLargeScreen ? 24.0 : 16.0),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(borderRadius),
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                        ),
-                      ),
-                      child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                    // Unit selector as clickable header (unit name only)
-                    InkWell(
-                      onTap: () => _showUnitSelector(true), // true for source unit
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(borderRadius),
-                        topRight: Radius.circular(borderRadius),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(isLargeScreen ? 16.0 : 12.0),
+              // Use a Stack to overlay the swap button between the two boxes
+              Stack(
+                children: [
+                  // Column for the two boxes
+                  Column(
+                    children: [
+                      // Source value box
+                      Container(
+                        height: 120,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.13), // slightly more contrast
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(borderRadius),
-                            topRight: Radius.circular(borderRadius),
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
                           ),
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
-                            width: 1.2,
+                            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text(
-                              _getUnitFullName(_fromUnit),
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: isLargeScreen ? 18.0 : null,
+                            InkWell(
+                              onTap: () => _showUnitSelector(true),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(12),
+                                topRight: Radius.circular(12),
                               ),
-                          ),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Colors.black38,
-                              size: 28,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Value display with symbol/abbreviation inline
-                    Expanded(
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(isLargeScreen ? 20.0 : 16.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              // For currency: symbol before value
-                              if (widget.converterType == ConverterType.currency) ...[
-                          Text(
-                                  _getUnitDisplayText(_fromUnit) + ' ',
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: isLargeScreen ? 22.0 : null,
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.13),
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(12),
+                                    topRight: Radius.circular(12),
+                                  ),
+                                  border: Border.all(
+                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                                    width: 1.2,
                                   ),
                                 ),
-                                Expanded(
-                                  child: Text(
-                                    _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
-                                    key: const Key('converter_input'),
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: isLargeScreen ? 22.0 : null,
-                            ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                  ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _getUnitFullName(_fromUnit),
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Colors.black38,
+                                      size: 28,
+                                    ),
+                                  ],
                                 ),
-                              ] else ...[
-                                // For other units: value first, then abbreviation (positioned next to value)
-                                Flexible(
-                                  child: RichText(
-                                    key: const Key('converter_input'),
-                                    text: TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                            fontSize: isLargeScreen ? 22.0 : null,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: ' ' + _getUnitDisplayText(_fromUnit),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.fromLTRB(16, 16, 60, 16), // Add right padding to avoid swap button
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      if (widget.converterType == ConverterType.currency) ...[
+                                        Text(
+                                          _getUnitDisplayText(_fromUnit) + ' ',
                                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                                             fontWeight: FontWeight.normal,
-                                            fontSize: isLargeScreen ? 22.0 : null,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
+                                            key: const Key('converter_input'),
+                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                          ),
+                                        ),
+                                      ] else ...[
+                                        Flexible(
+                                          child: RichText(
+                                            key: const Key('converter_input'),
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: _formatDisplayValueForLargeNumbers(_sourceValue.isEmpty ? '0' : _sourceValue),
+                                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context).colorScheme.onSurface,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: ' ' + _getUnitDisplayText(_fromUnit),
+                                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                                    fontWeight: FontWeight.normal,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
                                           ),
                                         ),
                                       ],
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Vertical swap button - Second row
-              Container(
-                margin: EdgeInsets.only(bottom: isLargeScreen ? 24.0 : 16.0),
-                child: Center(
-                  child: IconButton(
-                    onPressed: _swapUnits,
-                    icon: const Icon(Icons.swap_vert), // Changed to vertical
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                      padding: EdgeInsets.all(isLargeScreen ? 16.0 : 12.0),
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Result value box with integrated unit selector - Third row
-              Container(
-                height: containerHeight, // Responsive height
-                margin: EdgeInsets.only(bottom: isLargeScreen ? 24.0 : 16.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  borderRadius: BorderRadius.circular(borderRadius),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Unit selector as clickable header (unit name only)
-                    InkWell(
-                      onTap: () => _showUnitSelector(false), // false for target unit
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(borderRadius),
-                        topRight: Radius.circular(borderRadius),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(isLargeScreen ? 16.0 : 12.0),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.13), // slightly more contrast
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(borderRadius),
-                            topRight: Radius.circular(borderRadius),
-                          ),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.secondary.withOpacity(0.25),
-                            width: 1.2,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _getUnitFullName(_toUnit),
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.secondary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: isLargeScreen ? 18.0 : null,
                               ),
-                          ),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Colors.black38,
-                              size: 28,
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    // Value display with symbol/abbreviation inline
-                    Expanded(
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(isLargeScreen ? 20.0 : 16.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: _isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    // For currency: symbol before value
-                                    if (widget.converterType == ConverterType.currency) ...[
-                                      Text(
-                                        _getUnitDisplayText(_toUnit) + ' ',
-                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: isLargeScreen ? 22.0 : null,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
-                                          key: const Key('converter_result'),
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: isLargeScreen ? 22.0 : null,
+                      // Target value box
+                      Container(
+                        height: 120,
+                        margin: const EdgeInsets.only(top: 0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
+                            bottomLeft: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            InkWell(
+                              onTap: () => _showUnitSelector(false),
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(12),
+                                bottomRight: Radius.circular(12),
+                              ),
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.13),
+                                  borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(12),
+                                    bottomRight: Radius.circular(12),
                                   ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                        ),
+                                  border: Border.all(
+                                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.25),
+                                    width: 1.2,
+                                  ),
                                 ),
-                                    ] else ...[
-                                      // For other units: value first, then abbreviation (positioned next to value)
-                                      Flexible(
-                                        child: RichText(
-                                          key: const Key('converter_result'),
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
-                                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Theme.of(context).colorScheme.onSurface,
-                                                  fontSize: isLargeScreen ? 22.0 : null,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: ' ' + _getUnitDisplayText(_toUnit),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _getUnitFullName(_toUnit),
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        color: Theme.of(context).colorScheme.secondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Colors.black38,
+                                      size: 28,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: _isLoading
+                                      ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        )
+                                      : Row(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            if (widget.converterType == ConverterType.currency) ...[
+                                              Text(
+                                                _getUnitDisplayText(_toUnit) + ' ',
                                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                                                   fontWeight: FontWeight.normal,
-                                                  fontSize: isLargeScreen ? 22.0 : null,
                                                 ),
-                  ),
-                ],
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
+                                                  key: const Key('converter_result'),
+                                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 2,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Flexible(
+                                                child: RichText(
+                                                  key: const Key('converter_result'),
+                                                  text: TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: _formatDisplayValueForLargeNumbers(_result.isEmpty ? '0' : _result),
+                                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Theme.of(context).colorScheme.onSurface,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: ' ' + _getUnitDisplayText(_toUnit),
+                                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                                          fontWeight: FontWeight.normal,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 2,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ],
                                 ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Overlapping swap button - positioned on the right side
+                  Positioned(
+                    top: 120 - 20, // Smaller offset for smaller button
+                    right: 16, // Position on the right side
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        onPressed: _swapUnits,
+                        icon: const Icon(Icons.swap_vert, size: 20),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          padding: const EdgeInsets.all(8), // Smaller padding
+                          minimumSize: const Size(32, 32), // Smaller minimum size
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              
-              // Calculator input - Fourth row
-              Expanded(
-                child: Container(
-                  // Add bottom padding for iPad to prevent cutoff
-                  padding: EdgeInsets.only(bottom: isLargeScreen ? 20.0 : 0.0),
-                  child: CalculatorInput(
-                    onExpressionEvaluated: _convertLive,
-                    onExpressionChanged: _onCalculatorChanged,
-                    initialValue: _sourceValue,
-                    hideExpression: true,
                   ),
-                ),
+                ],
               ),
+              // Calculator section fills remaining space - removed expression box
+              Expanded(
+                child: CalculatorInput(
+                  initialValue: _sourceValue,
+                  onExpressionEvaluated: (value) {
+                    _onCalculatorChanged(value);
+                  },
+                  onExpressionChanged: (value) {
+                    _onCalculatorChanged(value);
+                  },
+                  hideExpression: true, // Hide the expression box
+                          ),
+                        ),
             ],
           ),
         ),

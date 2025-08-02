@@ -136,31 +136,22 @@ class CalculatorInputState extends State<CalculatorInput> {
   }
 
   Widget _buildButton(String label, {Color? color, double fontSize = 24}) {
-    // Get screen dimensions for responsive design
-    final screenSize = MediaQuery.of(context).size;
-    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
-    
-    // Responsive sizing - larger buttons for iPad
-    final buttonPadding = isLargeScreen ? 16.0 : 8.0;
-    final buttonFontSize = isLargeScreen ? fontSize + 6 : fontSize;
-    final borderRadius = isLargeScreen ? 24.0 : 16.0;
-    
     return Padding(
-      padding: EdgeInsets.all(isLargeScreen ? 8.0 : 4.0),
+      padding: const EdgeInsets.all(4.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
+            borderRadius: BorderRadius.circular(16),
           ),
           backgroundColor: color ?? Theme.of(context).colorScheme.surface,
           foregroundColor: Theme.of(context).colorScheme.onSurface,
           elevation: 1,
-          padding: EdgeInsets.all(buttonPadding),
+          padding: const EdgeInsets.all(8),
         ),
         onPressed: () => _onButtonPressed(label),
         child: Text(
           label, 
-          style: TextStyle(fontSize: buttonFontSize),
+          style: TextStyle(fontSize: fontSize),
           textAlign: TextAlign.center,
         ),
       ),

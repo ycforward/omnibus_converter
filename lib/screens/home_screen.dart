@@ -46,34 +46,19 @@ class _ConvertersTab extends StatelessWidget {
     final sortedTypes = List<ConverterType>.from(ConverterType.values)
       ..sort((a, b) => a.title.compareTo(b.title));
     
-    // Get screen dimensions for responsive design
-    final screenSize = MediaQuery.of(context).size;
-    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
-    final isLandscape = screenSize.width > screenSize.height;
-    
-    // Responsive grid layout - 4 columns for iPad landscape, 3 for iPad portrait, 2 for iPhone
-    final crossAxisCount = isLargeScreen 
-        ? (isLandscape ? 4 : 3) 
-        : 2;
-    final crossAxisSpacing = isLargeScreen ? 24.0 : 16.0;
-    final mainAxisSpacing = isLargeScreen ? 24.0 : 16.0;
-    final childAspectRatio = isLargeScreen ? 1.1 : 0.95;
-    final horizontalPadding = isLargeScreen ? 32.0 : 16.0;
-    final verticalPadding = isLargeScreen ? 24.0 : 16.0;
-    
     return Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: isLargeScreen ? 32.0 : 24.0),
+            const SizedBox(height: 24),
             Expanded(
               child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: crossAxisSpacing,
-                  mainAxisSpacing: mainAxisSpacing,
-                  childAspectRatio: childAspectRatio,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 0.95,
                 ),
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: sortedTypes.length,
@@ -96,18 +81,6 @@ class _ConverterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen dimensions for responsive design
-    final screenSize = MediaQuery.of(context).size;
-    final isLargeScreen = screenSize.width > 600; // iPad compatibility mode threshold
-    
-    // Responsive card styling
-    final cardPadding = isLargeScreen ? 20.0 : 16.0;
-    final iconSize = isLargeScreen ? 56.0 : 48.0;
-    final titleFontSize = isLargeScreen ? 18.0 : null;
-    final descriptionFontSize = isLargeScreen ? 14.0 : null;
-    final spacing = isLargeScreen ? 16.0 : 12.0;
-    final smallSpacing = isLargeScreen ? 8.0 : 4.0;
-    
     return Card(
       elevation: 4,
       child: InkWell(
@@ -122,39 +95,32 @@ class _ConverterCard extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: cardPadding, horizontal: cardPadding),
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 converterType.icon,
-                size: iconSize,
+                size: 48,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              SizedBox(height: spacing),
-              Flexible(
-                child: Text(
-                  converterType.title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: titleFontSize,
-                  ),
-                  textAlign: TextAlign.center,
+              const SizedBox(height: 12),
+              Text(
+                converterType.title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
+                textAlign: TextAlign.center,
               ),
-              SizedBox(height: smallSpacing),
-              Flexible(
-                child: Text(
-                  converterType.description,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: descriptionFontSize,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              const SizedBox(height: 4),
+              Text(
+                converterType.description,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

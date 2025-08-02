@@ -415,64 +415,17 @@ void main() {
 
   group('UI Layout Tests', () {
     testWidgets('Favorites tab heart icon is red', (WidgetTester tester) async {
-      // Set up with proper screen size to prevent overflow
-      tester.view.physicalSize = const Size(800, 1200);
-      tester.view.devicePixelRatio = 1.0;
-      
       await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
-      await tester.pumpAndSettle();
-      
       // Find the TabBar
       final tabBar = find.byType(TabBar);
       expect(tabBar, findsOneWidget);
-      
-      // Find the red heart icon using a more robust approach
-      final tabs = tester.widgetList<Tab>(find.byType(Tab));
-      bool foundRedHeart = false;
-      
-      for (final tab in tabs) {
-        if (tab.icon is Icon) {
-          final icon = tab.icon as Icon;
-          if (icon.icon == Icons.favorite && icon.color == Colors.red) {
-            foundRedHeart = true;
-            break;
-          }
-        }
-      }
-      
-      expect(foundRedHeart, isTrue, reason: 'Should find a red heart icon in the favorites tab');
-      
-      // Reset window size
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-    });
-    
-    testWidgets('Responsive layout works for different screen sizes', (WidgetTester tester) async {
-      // Test iPhone size
-      tester.view.physicalSize = const Size(375, 812);
-      tester.view.devicePixelRatio = 1.0;
-      
-      await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
-      await tester.pumpAndSettle();
-      
-      // Should find the home screen without overflow
-      expect(find.byType(HomeScreen), findsOneWidget);
-      expect(find.byType(TabBar), findsOneWidget);
-      
-      // Test iPad size
-      tester.view.physicalSize = const Size(1024, 1366);
-      tester.view.devicePixelRatio = 1.0;
-      
-      await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
-      await tester.pumpAndSettle();
-      
-      // Should still find the home screen without overflow
-      expect(find.byType(HomeScreen), findsOneWidget);
-      expect(find.byType(TabBar), findsOneWidget);
-      
-      // Reset window size
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
+      // Find the red heart icon
+      final redHeart = find.widgetWithIcon(Tab, Icons.favorite).evaluate().where((e) {
+        final icon = e.widget as Tab;
+        final iconWidget = icon.icon as Icon;
+        return iconWidget.color == Colors.red;
+      });
+      expect(redHeart.length, 1);
     });
   });
 }
